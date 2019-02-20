@@ -33,4 +33,4 @@ This project is licensed under the MIT License
 ## Acknowledgments
 
 * Inspiration - **François Michonneau** [https://github.com/fmichonneau](https://github.com/fmichonneau)
-* Guidance and support - Joanna McCaffrey - iDigBio Biodiversity Informatics Manager(*retired*)
+* Guidance and support - **Joanna McCaffrey** - iDigBio Biodiversity Informatics Manager(*retired*)
