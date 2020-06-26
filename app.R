@@ -9,7 +9,6 @@ library(dplyr)
 # This file handles all of the RSS parsing
 source("rss.R")
 
-
 # This script uses the iDigBio collections JSON endpoint:
 # http://idigbio.github.io/idb-us-collections/collections.json
 # to generate counts of records from the collections in the catalog,
@@ -80,8 +79,10 @@ VertNetTotals <- length(getFeed("http://ipt.vertnet.org:8080/ipt/rss.do")$items)
 # Data are currently here: 
 # https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt
 
-newDatasetsFile <- read.csv(url("https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv"),stringsAsFactors = F,sep = "\t",header = F) 
-newDatasetsFileOld <- read.csv(url("https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt"),stringsAsFactors = F,sep = "\t") %>% select(name:pub_date)
+n <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv", ssl.verifypeer = FALSE)
+newDatasetsFile <- read.csv(textConnection(n), stringsAsFactors = F,sep = "\t",header = F) 
+m  <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt", ssl.verifypeer = FALSE)
+newDatasetsFileOld <- read.csv(textConnection(m),stringsAsFactors = F,sep = "\t") %>% select(name:pub_date)
 names(newDatasetsFile) <- c('uuid','name','publisher_uuid','file_link','first_seen','pub_date','file_harvest_date')
 newDatasetsFile <- newDatasetsFile %>% select(name:pub_date) %>% filter(!publisher_uuid=="e699547d-080e-431a-8d9b-3d56e39808f0")
 
