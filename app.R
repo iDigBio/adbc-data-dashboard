@@ -63,7 +63,7 @@ for(q in seq_along(cc$recordsetQuery)){
 # Number of specimen-based datasets in the iDigBio IPT
 # Number of specimen-based datasets in the VertNet IPT
 
-iDigTotals <- length(getFeed("http://ipt.idigbio.org/rss.do")$items)
+iDigTotals <- length(getFeed("https://ipt.idigbio.org/rss.do")$items)
 VertNetTotals <- length(getFeed("http://ipt.vertnet.org:8080/ipt/rss.do")$items)
 
 #####################################################
@@ -79,9 +79,9 @@ VertNetTotals <- length(getFeed("http://ipt.vertnet.org:8080/ipt/rss.do")$items)
 # Data are currently here: 
 # https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt
 
-n <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv", ssl.verifypeer = FALSE)
+n <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv", ssl.verifypeer = TRUE)
 newDatasetsFile <- read.csv(textConnection(n), stringsAsFactors = F,sep = "\t",header = F) 
-m  <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt", ssl.verifypeer = FALSE)
+m  <- getURL("https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt", ssl.verifypeer = TRUE)
 newDatasetsFileOld <- read.csv(textConnection(m),stringsAsFactors = F,sep = "\t") %>% select(name:pub_date)
 names(newDatasetsFile) <- c('uuid','name','publisher_uuid','file_link','first_seen','pub_date','file_harvest_date')
 newDatasetsFile <- newDatasetsFile %>% select(name:pub_date) %>% filter(!publisher_uuid=="e699547d-080e-431a-8d9b-3d56e39808f0")
@@ -91,11 +91,11 @@ test <- setdiff(newDatasetsFile,newDatasetsFileOld)
 newDatasetsFile <- rbind(newDatasetsFileOld,test) %>% filter(!publisher_uuid=="e699547d-080e-431a-8d9b-3d56e39808f0")
 
 # One last cleaning attempt before building our dataframe
-rsData <- fromJSON("http://search.idigbio.org/v2/search/recordsets?limit=3000",flatten = T)$items
+rsData <- fromJSON("https://search.idigbio.org/v2/search/recordsets?limit=3000",flatten = T)$items
 newDatasetsFile <- newDatasetsFile[!newDatasetsFile$file_link %in% rsData$indexTerms.indexData.link,]
 
 
-sumR <- plyr::count(newDatasetsFile,"publisher_uuid") %>% rowwise() %>% mutate(publisher=fromJSON(paste0("http://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",publisher_uuid,"%22}"),flatten = T)$items$indexTerms.name) %>% select(publisher,freq)%>% arrange(desc(freq))
+sumR <- plyr::count(newDatasetsFile,"publisher_uuid") %>% rowwise() %>% mutate(publisher=fromJSON(paste0("https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",publisher_uuid,"%22}"),flatten = T)$items$indexTerms.name) %>% select(publisher,freq)%>% arrange(desc(freq))
 
 ##Need a little test code:
 #
@@ -108,7 +108,7 @@ sumR <- plyr::count(newDatasetsFile,"publisher_uuid") %>% rowwise() %>% mutate(p
 
 names(sumR) <- c("Publisher","New Datasets")
 
-sumP <- plyr::count(newDatasetsFile,"publisher_uuid") %>% arrange(desc(freq)) %>% rowwise() %>% mutate(publisher=fromJSON(paste0("http://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",publisher_uuid,"%22}"),flatten = T)$items$indexTerms.name) %>% select(publisher,publisher_uuid)
+sumP <- plyr::count(newDatasetsFile,"publisher_uuid") %>% arrange(desc(freq)) %>% rowwise() %>% mutate(publisher=fromJSON(paste0("https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",publisher_uuid,"%22}"),flatten = T)$items$indexTerms.name) %>% select(publisher,publisher_uuid)
 
 
 ############################
@@ -321,7 +321,7 @@ server <- function(input, output, session) {
     a <- subset(newDatasetsFile, publisher_uuid == uuidP) %>% select(-publisher_uuid)
     tryCatch(
       {
-        a$contact <- getFeed(fromJSON(paste0("http://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",uuidP,"%22}"),flatten = T)$items$data.rss_url)$header$webMaster
+        a$contact <- getFeed(fromJSON(paste0("https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",uuidP,"%22}"),flatten = T)$items$data.rss_url)$header$webMaster
       },
       error=function(cond) {
         return(a$contact<-NULL)
@@ -340,7 +340,7 @@ server <- function(input, output, session) {
   df_rss <- reactive({
     publ <- input$dataset
     uuidP <- sumP[sumP$publisher==publ,]$publisher_uuid
-    a <- fromJSON(paste0("http://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",uuidP,"%22}"),flatten = T)$items$data.rss_url
+    a <- fromJSON(paste0("https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",uuidP,"%22}"),flatten = T)$items$data.rss_url
     return(a)
   })
   output$datasetRSS <- renderPrint({ df_rss() })
