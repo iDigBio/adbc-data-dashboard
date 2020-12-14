@@ -5,7 +5,7 @@ The Advancing Digitization of Biodiversity Collections (ADBC) program is to prod
 
 ## Deployment
 
-The ADBC Data Dashboard is currently deployed here: [https://idigbio.shinyapps.io/adbc-biblio/][(https://idigbio.shinyapps.io/adbc-biblio/)
+The ADBC Data Dashboard is currently deployed here: [https://idigbio.shinyapps.io/adbc-biblio/](https://idigbio.shinyapps.io/adbc-biblio/)
 
 ## Built With
 
