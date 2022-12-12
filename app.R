@@ -17,10 +17,10 @@ source("loadCollData.R")
 #####################################################################
 
 # Fetch our dataframe from the collections endpoint
-cc <- loadCollData()
+colls <- loadCollData()
 
 # Funding types: these will be used in the map to select layers on the map
-fundingTypes <- unique(cc$type)
+fundingTypes <- unique(colls$type)
 
 ####################################################
 # Number of specimen-based datasets in the iDigBio IPT
@@ -32,13 +32,13 @@ iDigBioIptDatasetCount <- loadIDigTotals()
 vertNetIptDatasetCount <- loadVertNetTotals()
 
 # Known US Collections: this is wrong, it includes non-US collections
-knownUSCollectionsCount <- length(cc$collection)
-adbcFundedCollectionsCount <- length(cc[!cc$UniqueNameUUID == "", ]$collection)
-adbcFundedInstitutionsCount <- length(unique(cc[!cc$UniqueNameUUID == "", ]$UniqueNameUUID))
-collectionsProvidingDataCount <- length(cc[!is.na(cc$recordsetQuery), ]$collection)
+knownUSCollectionsCount <- length(colls$collection)
+adbcFundedCollectionsCount <- length(colls[!colls$UniqueNameUUID == "", ]$collection)
+adbcFundedInstitutionsCount <- length(unique(colls[!colls$UniqueNameUUID == "", ]$UniqueNameUUID))
+collectionsProvidingDataCount <- length(colls[!is.na(colls$recordsetQuery), ]$collection)
 
 # This is the sum total of contributed data from US Collections
-totalAdbcSpecimenRecords <- sum(cc$size)
+totalAdbcSpecimenRecords <- sum(colls$size)
 
 ############################
 # From our recordset data, can we tell how many come from Specify and Symbiota?
@@ -54,7 +54,7 @@ specifyCloudDatasetCount <- countSpecifyDatasets()
 # We need to know how many funded ADBC institutions
 # let's use the UniqueNameUUID
 
-#adbcInst <- length(unique(cc$UniqueNameUUID))
+#adbcInst <- length(unique(colls$UniqueNameUUID))
 
 
 #####################################################
@@ -62,16 +62,17 @@ specifyCloudDatasetCount <- countSpecifyDatasets()
 # publishers (except VertNet).  Table returned has
 # columns name, publisher_uuid, file_link, first_seen,
 # and 'pub_date'.
-newDatasets <- loadDatasetsData()
+newDatasets <- loadNewAndRecentDatasetsData()
 
 # Retrieve publisher names from search.idigbio for each publisher uuid in our new datasets file;
 # sort the publishers in decreasing order of new data sets.
 newDatasetsByPublisher <- createPublisherSummary(newDatasets)
 
-# Not at all sure what this is, I think it just matches publisher name to publisher uuid
-# but in the same order as the publishers appear in newDatasetsByPublisher (i.e., decreasing
-# order of number of new datasets)
-publisherNameToUuid <- getPublisherSummaryUuids(newDatasets)
+# This is a named list of publisher uuids, using the publisher names.
+# It is used as the list of choices to select from when viewing the
+# table of new datasets by publisher.  It is ordered by decreasing
+# number of new datasets published by the publisher.
+publisherChoices <- getPublisherChoiceList(newDatasets)
 
 
 ############################################
@@ -219,7 +220,7 @@ ui <- dashboardPage(
                    box(width = 12,
                        
                        ### Select a Publisher ###
-                       selectInput("dataset", "Choose a Publisher:", choices = publisherNameToUuid$publisher),
+                       selectInput("dataset", "Choose a Publisher:", choices = publisherChoices),
                        verbatimTextOutput("datasetRSS"),
                        
                        ### Download Button ###
@@ -269,7 +270,7 @@ server <- function(input, output, session) {
     level.order <- fundingTypes
     
     ### Map point markers and mouseover ###
-    p <-  plot_geo(cc, lat = ~ lat, lon = ~ lon) %>%
+    p <-  plot_geo(colls, lat = ~ lat, lon = ~ lon) %>%
       add_markers(
         text = ~ paste0(institution, "<br /> (", collection, ")"),
         hoverinfo = 'text',
@@ -311,8 +312,7 @@ server <- function(input, output, session) {
   # Sample publisher query:
   # https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%221c29be70-24e7-480b-aab1-61224ded0f34%22}
   df_subset <- reactive({
-    publ_name <- input$dataset
-    uuidP <- publisherNameToUuid[publisherNameToUuid$publisher == publ_name, ]$publisher_uuid
+    uuidP <- input$dataset
     a <-
       subset(newDatasets, publisher_uuid == uuidP) %>% select(-publisher_uuid)
     tryCatch({
@@ -335,8 +335,7 @@ server <- function(input, output, session) {
     rownames = FALSE
   ))
   df_rss <- reactive({
-    publ <- input$dataset
-    uuidP <- publisherNameToUuid[publisherNameToUuid$publisher == publ, ]$publisher_uuid
+    uuidP <- input$dataset
     rssUrl <- publishserRssUrlByUuid(uuidP)
     return(rssUrl)
   })

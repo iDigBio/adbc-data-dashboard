@@ -193,7 +193,7 @@ loadApiDatasetsData <- function() {
   return(apiDatasets)
 }
 
-loadDatasetsData <- function() {
+loadNewAndRecentDatasetsData <- function() {
   newDatasets <- loadNewDatasetsData()
   recentDatasets <- loadRecentDatasetsData()
   
@@ -264,13 +264,17 @@ createPublisherSummary <- function(newDatasets) {
   return(pubSummary)
 }
 
-getPublisherSummaryUuids <- function(newDatasets) {
+# Return a named list of publisher uuids sorted in order
+# of decreasing number of new datasets published
+getPublisherChoiceList <- function(newDatasets) {
   p <- plyr::count(newDatasets, "publisher_uuid") %>%
     arrange(desc(freq)) %>%
     rowwise() %>%
     mutate(publisher = publisherNameByUuid(publisher_uuid)) %>%
     select(publisher, publisher_uuid)
-  return(p)
+  choices <- p$publisher_uuid
+  names(choices) <- p$publisher
+  return(choices)
 }
 
 # Select Symbiota record set uuids on the basis of having "collicon" in data.logo_url field
