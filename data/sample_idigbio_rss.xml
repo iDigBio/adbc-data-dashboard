@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:ipt="http://ipt.gbif.org/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+  <channel>
+    <title>IPT - Hosted by iDigBio</title>
+    <link>https://ipt.idigbio.org</link>
+    <atom:link href="https://ipt.idigbio.org/rss.do" rel="self" type="application/rss+xml"/>
+    <description>Resource metadata of IPT - Hosted by iDigBio</description>
+    <language>en-us</language>
+      <!-- RFC-822 date-time / Wed, 02 Oct 2010 13:00:00 GMT -->
+      <pubDate>Mon, 07 Dec 2015 19:49:02 +0000</pubDate>
+      <lastBuildDate>Fri, 09 Dec 2022 19:58:15 +0000</lastBuildDate>
+      <!-- UUID of the IPT making RSS feed available -->
+      <ipt:identifier>c6c9f784-8af9-4631-9912-dde88e38fafb</ipt:identifier>
+    <generator>GBIF IPT 2.5.6-rd6f172f</generator>
+      <webMaster>klove@flmnh.ufl.edu (Kevin Love)</webMaster>
+    <docs>http://cyber.law.harvard.edu/rss/rss.html</docs>
+    <ttl>15</ttl>
+      <geo:Point>
+        <geo:lat>29.6450618</geo:lat>
+        <geo:long>-82.3448994</geo:long>
+      </geo:Point>
+      <item>
+        <title>Santa Barbara Museum of Natural History - Invertebrate Zoology - Version 1.19</title>
+        <link>https://ipt.idigbio.org/resource?r=sbmnh-iz</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>[The Invertebrate Zoology collection at the Santa Barbara Museum of Natural History (SBMNH) houses 2.5 million specimens of several invertebrate taxa from worldwide localities. The collection specializes in phylum Mollusca, from both marine and terrestrial habitats. Roughly 20% of the collection is currently cataloged and available online. Please inquire further about groups that may be of interest, but are not found when searching our collection digitally.]</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=sbmnh-iz</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=sbmnh-iz</ipt:dwca>
+        <pubDate>Fri, 09 Dec 2022 19:58:32 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=sbmnh-iz/v1.19</guid>
+      </item>
+      <item>
+        <title>BMSM Bailey-Matthews National Shell Museum - Version 1.40</title>
+        <link>https://ipt.idigbio.org/resource?r=bmnsm-shell</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>fixing DwC mappings</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=bmnsm-shell</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=bmnsm-shell</ipt:dwca>
+        <pubDate>Wed, 09 Nov 2022 18:00:52 +0000</pubDate>
+        <guid isPermaLink="false">417f4d21-959b-4773-90a2-c38d1822d873/v1.40</guid>
+      </item>
+      <item>
+        <title>Auburn University Museum of Natural History Invertebrates - Version 1.6</title>
+        <link>https://ipt.idigbio.org/resource?r=aum-inverts</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Data update</description>
+        <author>bvv0002@auburn.edu (Brianne Varnerin)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=aum-inverts</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=aum-inverts</ipt:dwca>
+        <pubDate>Fri, 21 Oct 2022 20:33:32 +0000</pubDate>
+        <guid isPermaLink="false">4655f1f3-60a5-4346-a343-84f5836a4585/v1.6</guid>
+      </item>
+      <item>
+        <title>CMC Cincinnati Museum Center Vertebrate Paleontology - Version 1.1</title>
+        <link>https://ipt.idigbio.org/resource?r=cmc-vertpaleo</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Initial public data publish</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=cmc-vertpaleo</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=cmc-vertpaleo</ipt:dwca>
+        <pubDate>Fri, 09 Sep 2022 20:30:46 +0000</pubDate>
+        <guid isPermaLink="false">8b86f646-d410-4dd6-9e96-0574262fb9f0/v1.1</guid>
+      </item>
+      <item>
+        <title>CMC Cincinnati Museum Center Invertebrate Paleontology - Version 1.8</title>
+        <link>https://ipt.idigbio.org/resource?r=cmc-paleo</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>September 2022 data updates</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=cmc-paleo</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=cmc-paleo</ipt:dwca>
+        <pubDate>Fri, 09 Sep 2022 18:59:49 +0000</pubDate>
+        <guid isPermaLink="false">361d98ca-ba9d-4b85-a64f-7db8fb35c6a9/v1.8</guid>
+      </item>
+      <item>
+        <title>LACM Malacology - Version 1.5</title>
+        <link>https://ipt.idigbio.org/resource?r=lacm-mollusks</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Natural History Museum of Los Angeles County Malacology Collection; September 7, 2022</description>
+        <author>ekrimmel@nhm.org (Erica Krimmel)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=lacm-mollusks</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=lacm-mollusks</ipt:dwca>
+        <pubDate>Wed, 07 Sep 2022 19:45:57 +0000</pubDate>
+        <guid isPermaLink="false">ec0ad39f-3370-4d51-a663-cb27abd2a6bb/v1.5</guid>
+      </item>
+      <item>
+        <title>Auburn University Museum of Natural History Mollusks - Version 1.4</title>
+        <link>https://ipt.idigbio.org/resource?r=aum-mollusks</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Data Update</description>
+        <author>bvv0002@auburn.edu (Brianne Varnerin)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=aum-mollusks</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=aum-mollusks</ipt:dwca>
+        <pubDate>Wed, 18 May 2022 19:34:39 +0000</pubDate>
+        <guid isPermaLink="false">7eae038e-7a8e-492e-a4dc-43238cce7c52/v1.4</guid>
+      </item>
+      <item>
+        <title>HBOI Marine Biomedical and Biotechnology Reference Collection (MBRC) - Version 1.2</title>
+        <link>https://ipt.idigbio.org/resource?r=mbrc</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Public-facing data publish</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mbrc</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mbrc</ipt:dwca>
+        <pubDate>Wed, 15 Dec 2021 18:03:45 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=mbrc/v1.2</guid>
+      </item>
+      <item>
+        <title>SDSM Invertebrate Collections - Version 1.13</title>
+        <link>https://ipt.idigbio.org/resource?r=sdsm</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>March 2021 data updates</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=sdsm</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=sdsm</ipt:dwca>
+        <pubDate>Thu, 08 Apr 2021 17:54:38 +0000</pubDate>
+        <guid isPermaLink="false">d9e3a5bc-3811-4811-a78c-77d78a2107d7/v1.13</guid>
+      </item>
+      <item>
+        <title>SDSM Vertebrate Paleontology Collection - Version 1.14</title>
+        <link>https://ipt.idigbio.org/resource?r=sdsm-vertpaleo</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>March 2021 data updates</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=sdsm-vertpaleo</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=sdsm-vertpaleo</ipt:dwca>
+        <pubDate>Thu, 08 Apr 2021 17:21:27 +0000</pubDate>
+        <guid isPermaLink="false">3144bbc8-9ebc-47fe-9f23-c575716eb357/v1.14</guid>
+      </item>
+      <item>
+        <title>SDSM Botany and Paleobotany Collections - Version 1.10</title>
+        <link>https://ipt.idigbio.org/resource?r=sdsm-paleobotany</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>March 2021 data updates</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=sdsm-paleobotany</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=sdsm-paleobotany</ipt:dwca>
+        <pubDate>Thu, 08 Apr 2021 17:04:02 +0000</pubDate>
+        <guid isPermaLink="false">40275fc6-3e71-4d76-aafe-276bdeefcd86/v1.10</guid>
+      </item>
+      <item>
+        <title>Auburn University Museum of Natural History Entomology - Version 1.2</title>
+        <link>https://ipt.idigbio.org/resource?r=aum-entomology</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>updates</description>
+        <author>msc0042@auburn.edu (Melissa Callahan)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=aum-entomology</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=aum-entomology</ipt:dwca>
+        <pubDate>Wed, 20 Jan 2021 17:56:24 +0000</pubDate>
+        <guid isPermaLink="false">bb71d4cb-6cc3-4730-a170-82912cc84475/v1.2</guid>
+      </item>
+      <item>
+        <title>AMNH Invertebrate Paleontology WIS-Cretaceous Research Collection - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=amnh-fi-wis</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>2021 update</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=amnh-fi-wis</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=amnh-fi-wis</ipt:dwca>
+        <pubDate>Tue, 12 Jan 2021 17:48:47 +0000</pubDate>
+        <guid isPermaLink="false">685a86cc-2cd8-4fd6-92b7-c3661dd43dad/v1.3</guid>
+      </item>
+      <item>
+        <title>LACM Invertebrate Paleontology - Version 1.9</title>
+        <link>https://ipt.idigbio.org/resource?r=lacm-ip</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Updating Image Links to Hi-Res versions.</description>
+        <author>wmertz@nhm.org (William Mertz)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=lacm-ip</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=lacm-ip</ipt:dwca>
+        <pubDate>Wed, 16 Dec 2020 00:54:30 +0000</pubDate>
+        <guid isPermaLink="false">f0a7ca6e-8da6-4629-97bd-0368705a4d6b/v1.9</guid>
+      </item>
+      <item>
+        <title>OC Parks – County of Orange Paleontological and Archaeological Collection - Version 1.5</title>
+        <link>https://ipt.idigbio.org/resource?r=ocpc</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Publishing with updated metadata upon request from this organization.</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ocpc</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ocpc</ipt:dwca>
+        <pubDate>Thu, 03 Dec 2020 21:01:22 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=ocpc/v1.5</guid>
+      </item>
+      <item>
+        <title>University of Wyoming, Geological Museum, Collection of Fossil Vertebrates - Fossil Vertebrates - Version 1.1</title>
+        <link>https://ipt.idigbio.org/resource?r=uwyo-vp</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>initial public-facing DwC-A publication</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=uwyo-vp</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=uwyo-vp</ipt:dwca>
+        <pubDate>Thu, 03 Dec 2020 17:40:34 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=uwyo-vp/v1.1</guid>
+      </item>
+      <item>
+        <title>myFOSSIL eMuseum - Version 1.7</title>
+        <link>https://ipt.idigbio.org/resource?r=myfossil</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>[The myFOSSIL eMuseum is a community science project funded by the U.S. National Science Foundation. Our mFeM on-line museum curates vouchered fossil specimens with the associated metadata. All occurrence records are curated by mFeM staff and experts from the community. The mission of mFeM is to promote public participation in science and to promote research and education in paleontology.]</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=myfossil</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=myfossil</ipt:dwca>
+        <pubDate>Tue, 20 Oct 2020 15:25:44 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=myfossil/v1.7</guid>
+      </item>
+      <item>
+        <title>Fort Hays State University Sternberg Museum of Natural History - Vertebrate - Version 1.6</title>
+        <link>https://ipt.idigbio.org/resource?r=fhsm-vp</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Additional catalogued specimens and images</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=fhsm-vp</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=fhsm-vp</ipt:dwca>
+        <pubDate>Fri, 11 Sep 2020 14:43:30 +0000</pubDate>
+        <guid isPermaLink="false">c784ba5b-491f-4d1d-8a44-0dc457889087/v1.6</guid>
+      </item>
+      <item>
+        <title>Carnegie Museum of Natural History - Paleobotany - Version 1.2</title>
+        <link>https://ipt.idigbio.org/resource?r=cmnh-pb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Making public</description>
+        <author>cac469@nau.edu (Cat Chapman)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=cmnh-pb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=cmnh-pb</ipt:dwca>
+        <pubDate>Fri, 25 Sep 2020 15:49:50 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=cmnh-pb/v1.2</guid>
+      </item>
+      <item>
+        <title>Fort Hays State University Sternberg Museum of Natural History - Invertebrate - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=fhsm-ip</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Data updates September 2020</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=fhsm-ip</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=fhsm-ip</ipt:dwca>
+        <pubDate>Wed, 02 Sep 2020 19:09:09 +0000</pubDate>
+        <guid isPermaLink="false">1c37eefc-6e7c-49a5-9ea1-f1e9eefb07bc/v1.3</guid>
+      </item>
+      <item>
+        <title>LACM Rancho La Brea - Version 1.1</title>
+        <link>https://ipt.idigbio.org/resource?r=lacm-rlb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Rancho La Brea Tarpits; Fossil Insect Collaborative TCN (NSF 1702342)</description>
+        <author>ekrimmel@nhm.org (Erica Krimmel)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=lacm-rlb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=lacm-rlb</ipt:dwca>
+        <pubDate>Wed, 13 May 2020 16:12:51 +0000</pubDate>
+        <guid isPermaLink="false">37eeb5de-fec3-404a-ba4f-62218ac6c860/v1.1</guid>
+      </item>
+      <item>
+        <title>Gabon Biodiversity Collection Amphibian - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=gbc-a</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Images have been added to this dataset.</description>
+        <author>elietobi@gmail.com (Elie Tobi)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=gbc-a</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=gbc-a</ipt:dwca>
+        <pubDate>Mon, 08 Oct 2018 15:30:02 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=gbc-a/v1.3</guid>
+      </item>
+      <item>
+        <title>Auburn University Museum of Natural History Algae - Version 1.1</title>
+        <link>https://ipt.idigbio.org/resource?r=aum-algae</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Publish public version of algae data.</description>
+        <author>hansecj@auburn.edu (Curtis Hansen)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=aum-algae</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=aum-algae</ipt:dwca>
+        <pubDate>Wed, 28 Aug 2019 14:47:21 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=aum-algae/v1.1</guid>
+      </item>
+      <item>
+        <title>University of California Riverside, Entomology Research Museum - Version 1.2</title>
+        <link>https://ipt.idigbio.org/resource?r=ucrc</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>[Among the many strengths of UCR's collection are its holdings of native bees and parasitic Hymenoptera, as well as the families Asilidae, Bombyliidae, and Sciomyzidae (Diptera), Coccinellidae, Staphylinidae, and Meloidae (Coleoptera), Aphididae and Miridae (Hemiptera), and the order Thysanoptera. Of particular interest is its large collection of immature insects (the work of the late L.D. Anderson), and an enormous voucher collection from a 10-year faunistic survey of the Boyd Deep Canyon Research Center, a substantial portion of which is now databased. Our holdings, of roughly 4 million specimens (placing it among the 20 largest insect collections in North America), include primarily terrestrial insects from Southern California and Arizona, with strong representations of Mexican insects (primarily Baja California and Sonora), and various other parts of the world including Thailand, Brazil, Honduras, Russia, India, and Australia.]</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ucrc</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ucrc</ipt:dwca>
+        <pubDate>Wed, 22 May 2019 22:23:54 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=ucrc/v1.2</guid>
+      </item>
+      <item>
+        <title>AMNH Vertebrate Paleontology WIS-Fossil Fish, Turtle and Mosasaur Collection - Version 1.1</title>
+        <link>https://ipt.idigbio.org/resource?r=amnh-vp-wis</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Set visibility to public</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=amnh-vp-wis</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=amnh-vp-wis</ipt:dwca>
+        <pubDate>Tue, 21 May 2019 13:48:00 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=amnh-vp-wis/v1.1</guid>
+      </item>
+      <item>
+        <title>University of Colorado Fossil Vertebrates Collections - Version 1.0</title>
+        <link>https://ipt.idigbio.org/resource?r=ucm-vertebrate</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Initial data publication</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ucm-vertebrate</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ucm-vertebrate</ipt:dwca>
+        <pubDate>Tue, 02 Apr 2019 19:10:46 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=ucm-vertebrate/v1.0</guid>
+      </item>
+      <item>
+        <title>MPM Milwaukee Public Museum Invertebrate Zoology Collection - Version 1.7</title>
+        <link>https://ipt.idigbio.org/resource?r=mpm-invert</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>New records added</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mpm-invert</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mpm-invert</ipt:dwca>
+        <pubDate>Tue, 19 Mar 2019 15:27:05 +0000</pubDate>
+        <guid isPermaLink="false">c081d6d4-cb80-45b3-b9cd-dab5568b8c5e/v1.7</guid>
+      </item>
+      <item>
+        <title>MCNH Museum of Cultural and Natural History Reptile Collection - Version 1.14</title>
+        <link>https://ipt.idigbio.org/resource?r=mcnh-reptile</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>New record added by correcting missing occurrenceID</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mcnh-reptile</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mcnh-reptile</ipt:dwca>
+        <pubDate>Fri, 08 Mar 2019 14:32:38 +0000</pubDate>
+        <guid isPermaLink="false">4ec02cdc-1266-473e-8609-dc280706ca7b/v1.14</guid>
+      </item>
+      <item>
+        <title>Aggregated occurrence records of the federally endangered Poweshiek skipperling (Oarisma poweshiek) - Version 1.10</title>
+        <link>https://ipt.idigbio.org/resource?r=cmc</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>revise coordinates of two records (last attempt failed)</description>
+        <author>belit1mw@cmich.edu (Michael Belitz)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=cmc</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=cmc</ipt:dwca>
+        <pubDate>Tue, 02 Oct 2018 18:19:27 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=cmc/v1.10</guid>
+      </item>
+      <item>
+        <title>Oklahoma Vascular Plants Database - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=okl-herb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Updated resource name.</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=okl-herb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=okl-herb</ipt:dwca>
+        <pubDate>Mon, 24 Sep 2018 15:04:23 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=okl-herb/v1.3</guid>
+      </item>
+      <item>
+        <title>MCNH Museum of Cultural and Natural History Bird Collection - Version 1.0</title>
+        <link>https://ipt.idigbio.org/resource?r=mcnh-bird</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Initial data publication. Updates will be made to field mappings in future releases.</description>
+        <author>klove@flmnh.ufl.edu (Kevin Love)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mcnh-bird</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mcnh-bird</ipt:dwca>
+        <pubDate>Wed, 12 Sep 2018 19:06:07 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=mcnh-bird/v1.0</guid>
+      </item>
+      <item>
+        <title>UCR University of California Riverside Herbarium - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=ucr-plants</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Added dwc:genus to this version.</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ucr-plants</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ucr-plants</ipt:dwca>
+        <pubDate>Mon, 02 Jul 2018 19:35:10 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=ucr-plants/v1.3</guid>
+      </item>
+      <item>
+        <title>LSUM Bernard Lowy Mycological Herbarium at Louisiana State University - Fungi - Version 1.7</title>
+        <link>https://ipt.idigbio.org/resource?r=lsum-fungi</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>[Louisiana State University Herbarium Lichen Collection: ca. 44,000 specimens, particularly from Louisiana, California, throughout North America, and worldwide through exchange and collections by Shirley C. Tucker.]</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=lsum-fungi</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=lsum-fungi</ipt:dwca>
+        <pubDate>Thu, 21 Jun 2018 20:37:57 +0000</pubDate>
+        <guid isPermaLink="false">0d4af118-b79e-40c7-9cc6-142c5027cb16/v1.7</guid>
+      </item>
+      <item>
+        <title>LSU Shirley C. Tucker Herbarium at Louisiana State University - Algae - Version 1.10</title>
+        <link>https://ipt.idigbio.org/resource?r=lsu-algae</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>[Louisiana State University Herbarium Algal Collection: approximately 50 specimens mostly from USA.]</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=lsu-algae</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=lsu-algae</ipt:dwca>
+        <pubDate>Thu, 21 Jun 2018 20:36:01 +0000</pubDate>
+        <guid isPermaLink="false">88ba1ac8-497d-4aa4-b2de-bf2d71739a29/v1.10</guid>
+      </item>
+      <item>
+        <title>TEST for oVert - Version 1.16</title>
+        <link>https://ipt.idigbio.org/resource?r=test</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>swapped two fields: coreId and associatedSpecimen reference</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=test</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=test</ipt:dwca>
+        <pubDate>Fri, 23 Feb 2018 21:39:08 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=test/v1.16</guid>
+      </item>
+      <item>
+        <title>AMNH Invertebrate Paleontology Collection - Version 1.10</title>
+        <link>https://ipt.idigbio.org/resource?r=amnh-fi</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>added default instititutionCode, some were missing</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=amnh-fi</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=amnh-fi</ipt:dwca>
+        <pubDate>Thu, 07 Dec 2017 17:09:36 +0000</pubDate>
+        <guid isPermaLink="false">f8e14cc1-cd02-4882-87f7-c5744714b962/v1.10</guid>
+      </item>
+      <item>
+        <title>MCNH Museum of Cultural and Natural History Amphibian Collection - Version 1.14</title>
+        <link>https://ipt.idigbio.org/resource?r=mcnh-amphibian</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>added family taxonomic coverage</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mcnh-amphibian</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mcnh-amphibian</ipt:dwca>
+        <pubDate>Mon, 04 Dec 2017 17:04:18 +0000</pubDate>
+        <guid isPermaLink="false">69cfc2db-6fc5-4fdb-886c-5c393dc252eb/v1.14</guid>
+      </item>
+      <item>
+        <title>MCNH Museum of Cultural and Natural History Fish Collection - Version 1.12</title>
+        <link>https://ipt.idigbio.org/resource?r=mcnh-fish</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>First edition - edited</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mcnh-fish</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mcnh-fish</ipt:dwca>
+        <pubDate>Wed, 22 Nov 2017 15:23:56 +0000</pubDate>
+        <guid isPermaLink="false">2526aea6-ccd0-4d83-a55d-46efcdb3f010/v1.12</guid>
+      </item>
+      <item>
+        <title>ECOT EcoTarium Ornithology Collection - Version 1.3</title>
+        <link>https://ipt.idigbio.org/resource?r=ecot-birds</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>adding media</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ecot-birds</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ecot-birds</ipt:dwca>
+        <pubDate>Wed, 18 Oct 2017 16:18:39 +0000</pubDate>
+        <guid isPermaLink="false">4da5c45a-54be-4de3-bf51-9d1bbe1f43b6/v1.3</guid>
+      </item>
+      <item>
+        <title>MCNH Museum of Cultural and Natural History Mammals Collection - Version 1.10</title>
+        <link>https://ipt.idigbio.org/resource?r=mcnh-mamm</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>remove Alec Z. as contact.</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mcnh-mamm</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mcnh-mamm</ipt:dwca>
+        <pubDate>Thu, 20 Jul 2017 13:43:33 +0000</pubDate>
+        <guid isPermaLink="false">91b322c7-1007-448d-be03-6db86cf3d869/v1.10</guid>
+      </item>
+      <item>
+        <title>FSUCML Zoological Collections - Version 1.0</title>
+        <link>https://ipt.idigbio.org/resource?r=fsucml-zoo</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Publish first version</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=fsucml-zoo</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=fsucml-zoo</ipt:dwca>
+        <pubDate>Tue, 08 Mar 2016 14:24:15 +0000</pubDate>
+        <guid isPermaLink="false">969d55f6-ed52-4be9-a6dd-7afeccdfde76/v1.0</guid>
+      </item>
+      <item>
+        <title>UPRM Invertebrate Collection - Version 1.5</title>
+        <link>https://ipt.idigbio.org/resource?r=uprm-invcol</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>data update</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=uprm-invcol</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=uprm-invcol</ipt:dwca>
+        <pubDate>Sat, 29 Oct 2016 01:24:21 +0000</pubDate>
+        <guid isPermaLink="false">1162234d-4e06-4d63-8a49-034184a38c7e/v1.5</guid>
+      </item>
+      <item>
+        <title>MPM Milwaukee Public Museum Herbarium - Version 1.5</title>
+        <link>https://ipt.idigbio.org/resource?r=mil-herb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>remove JMc's phone number</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mil-herb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mil-herb</ipt:dwca>
+        <pubDate>Thu, 20 Jul 2017 13:36:31 +0000</pubDate>
+        <guid isPermaLink="false">9168f50d-350e-4af1-ba97-17274f1faeaf/v1.5</guid>
+      </item>
+      <item>
+        <title>MUGM Miami University Invertebrate Paleontology Collection - Version 1.11</title>
+        <link>https://ipt.idigbio.org/resource?r=mugm-ip</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Final edits in rank class and other miscellaneous</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=mugm-ip</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=mugm-ip</ipt:dwca>
+        <pubDate>Tue, 29 Nov 2016 22:25:19 +0000</pubDate>
+        <guid isPermaLink="false">https://ipt.idigbio.org/resource?id=mugm-ip/v1.11</guid>
+      </item>
+      <item>
+        <title>DAV UC Davis Center for Plant Diversity - Version 1.4</title>
+        <link>https://ipt.idigbio.org/resource?r=ucdavis-herb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>added citation string</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=ucdavis-herb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=ucdavis-herb</ipt:dwca>
+        <pubDate>Mon, 21 Nov 2016 17:09:15 +0000</pubDate>
+        <guid isPermaLink="false">84de00a0-f762-11e1-a439-00145eb45e9a/v1.4</guid>
+      </item>
+      <item>
+        <title>UMPC University of Montana Paleontology Center - Version 1.6</title>
+        <link>https://ipt.idigbio.org/resource?r=umpc-paleo</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>Fixed alias in organization</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=umpc-paleo</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=umpc-paleo</ipt:dwca>
+        <pubDate>Mon, 24 Oct 2016 14:43:35 +0000</pubDate>
+        <guid isPermaLink="false">6bc8ff15-8517-4704-96fc-b8696377b364/v1.6</guid>
+      </item>
+      <item>
+        <title>BRFC Black Rock Forest Consortium Herbarium - Version 1.4</title>
+        <link>https://ipt.idigbio.org/resource?r=brfc-herb</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>added Audubon Core</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=brfc-herb</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=brfc-herb</ipt:dwca>
+        <pubDate>Mon, 29 Aug 2016 18:48:02 +0000</pubDate>
+        <guid isPermaLink="false">4bfd658b-5d1c-496c-8ac9-c2aaa9c01557/v1.4</guid>
+      </item>
+      <item>
+        <title>UTEX Culture Collection of Algae at The University of Texas Living Algae Holdings - Version 1.2</title>
+        <link>https://ipt.idigbio.org/resource?r=utex</link>
+        <!-- shows what changed in this version, or shows the resource description if change summary was empty -->
+        <description>updated with GBIF registration.</description>
+        <author>jmccaffrey@flmnh.ufl.edu (Joanna McCaffrey)</author>
+        <ipt:eml>https://ipt.idigbio.org/eml.do?r=utex</ipt:eml>
+        <ipt:dwca>https://ipt.idigbio.org/archive.do?r=utex</ipt:dwca>
+        <pubDate>Wed, 13 Jan 2016 16:20:36 +0000</pubDate>
+        <guid isPermaLink="false">70fc5154-6019-4d96-b9a7-fdce469d0260/v1.2</guid>
+      </item>
+  </channel>
+</rss>
