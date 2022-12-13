@@ -1,4 +1,4 @@
-library(RCurl)
+library(curl)
 library(XML)
 
 
