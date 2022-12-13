@@ -64,8 +64,9 @@ specifyCloudDatasetCount <- countSpecifyDatasets()
 # and 'pub_date'.
 newDatasets <- loadNewAndRecentDatasetsData()
 
-# Retrieve publisher names from search.idigbio for each publisher uuid in our new datasets file;
-# sort the publishers in decreasing order of new data sets.
+# Retrieve publisher names from search.idigbio for each publisher uuid
+# in our new datasets file;  sort the publishers in decreasing order of
+# new data sets.
 newDatasetsByPublisher <- createPublisherSummary(newDatasets)
 
 # This is a named list of publisher uuids, using the publisher names.
@@ -170,7 +171,7 @@ ui <- dashboardPage(
       fluidRow(
         column(width = 12,
                plotlyOutput("plot1"),
-               verbatimTextOutput("click"))
+               verbatimTextOutput("coll_summary"))
       ),
       
       ### Dataset Counts ###
@@ -277,40 +278,31 @@ server <- function(input, output, session) {
         color = ~ type,
         symbol = I("circle"),
         size = I(8),
-        key =  ~ paste(institution, collection, sep = "\n")
+        key = ~ idx
       ) %>%
       layout(title = 'U.S. Collections Contributing Data to iDigBio', geo = g)
     p
     
   })
-  ## Clicking points on the map will render the data
-  output$click <- renderText({
+  
+  ## Clicking points on the map will display coll summary below the map
+  output$coll_summary <- renderText({
     d <- event_data("plotly_click")
-    if (is.null(d)) {
-      "Click on a point to view data"
-    } else {
-      if (d$curveNumber == 0) {
-        typeQ <- "Funded participants (not publishing)"
-      } else if (d$curveNumber == 1) {
-        typeQ <- "Publishing data"
-      } else {
-        typeQ <- "Unfunded collections (not publishing)"
-      }
-      fu <- mm[mm$type == typeQ, ]
-      row.names(fu) <- NULL
-      fu <- fu[d$pointNumber + 1, ]
-      paste(fu$institution, fu$collection, fu$hover, sep = "\n")
+    if (length(d) == 0) { "Click on a point to view data" }
+    else {
+      c <- colls[d$key, ]
+      paste(c$institution, c$collection, c$coll_portal_url, sep = "\n")
     }
   })
+  
   ## Data reports output table
   output$newdatasetReport <- DT::renderDataTable(DT::datatable(
     newDatasetsByPublisher,
     options = list(paging = FALSE),
     rownames = FALSE
   ))
+  
   ## Reporting table subset
-  # Sample publisher query:
-  # https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%221c29be70-24e7-480b-aab1-61224ded0f34%22}
   df_subset <- reactive({
     uuidP <- input$dataset
     a <-

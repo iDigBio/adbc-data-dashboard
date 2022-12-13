@@ -23,11 +23,12 @@ loadCollData <- function() {
   # Add a column "size" containing the number of records in the collection
   colls <- loadRecordCounts(colls) 
   
-  # Add a column "hover"
-  colls <- addHoverLink(colls)
+  # Add a column "coll_portal_url"
+  colls <- addCollPortalUrl(colls)
   
-  #mm <- mm[order(factor(mm$type, levels = fundingTypes)), ]
-  
+  # Add an idx column; this is for looking up the row from a click event
+  colls <- cbind(colls, idx = as.numeric(row.names(colls)))
+
   return(colls)
 }
 
@@ -55,10 +56,10 @@ addFundingType <- function(collsJson) {
   return(collsJson)
 }
 
-addHoverLink <- function(collsJson) {
-  # Add a "hover" column containing a collection link
+addCollPortalUrl <- function(collsJson) {
+  # Add a coll_url column containing a collection link
   collsJson %>%
-    mutate(hover = paste0(
+    mutate(coll_portal_url = paste0(
       "https://www.idigbio.org/portal/collections/",
       gsub("urn:uuid:", "", collection_uuid)
     ))
