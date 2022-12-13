@@ -17,9 +17,15 @@ source("loadCollData.R")
 #####################################################################
 
 # Fetch our dataframe from the collections endpoint
+# This data comes from our own resource in GBIF's Registry API
+# https://api.gbif.org/v1/external/idigbio/collections
 colls <- loadCollData()
 
 # Funding types: these will be used in the map to select layers on the map
+# They come from presence/absence of fields recordsetQuery (is publishing)
+# UniqueNameUUID (is funded).  The types are:
+# "Publishing data", "Unfunded collections (not publishing)", and
+# "Funded participants (not publishing)"
 fundingTypes <- unique(colls$type)
 
 ####################################################
@@ -31,9 +37,20 @@ iDigBioIptDatasetCount <- loadIDigTotals()
 # Number of <item> elements in the VertNet IPT rss feed
 vertNetIptDatasetCount <- loadVertNetTotals()
 
-# Known US Collections: this is wrong, it includes non-US collections
+# Known US Collections: this counts all the collections found in our collections
+# resource on the GBIF Registry.  https://github.com/gbif/registry/issues/229
+# GBIF lists a collection under the /idigbio/collections url if the collection
+# has a machine tag "CollectionUUID" in the iDigBIo namespace "iDigBIo.org"
+# https://github.com/gbif/registry/blob/dev/registry-persistence/src/main/resources/org/gbif/registry/persistence/mapper/collections/external/IDigBioMapper.xml
 knownUSCollectionsCount <- length(colls$collection)
+
+# If the collection record has a UniqueNameUUID, we say it's funded
+# https://github.com/iDigBio/idb-us-collections
+# "UniqueNameUUID this property is used by iDigBio staff to maintain a
+# hierarchical relationship between institutions and collections"
 adbcFundedCollectionsCount <- length(colls[!colls$UniqueNameUUID == "", ]$collection)
+
+# 
 adbcFundedInstitutionsCount <- length(unique(colls[!colls$UniqueNameUUID == "", ]$UniqueNameUUID))
 collectionsProvidingDataCount <- length(colls[!is.na(colls$recordsetQuery), ]$collection)
 
@@ -258,8 +275,8 @@ server <- function(input, output, session) {
     # Map it!
     # geo styling
     g <- list(
-      scope = 'usa',
-      projection = list(type = 'albers usa'),
+      scope = "usa",
+      projection = list(type = "albers usa"),
       showland = TRUE,
       landcolor = toRGB("gray95"),
       subunitcolor = toRGB("gray85"),
