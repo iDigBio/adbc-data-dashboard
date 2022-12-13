@@ -6,8 +6,8 @@ loadCollData <- function() {
   # This is where the data lives now; it is managed by GBIF but we have our own API call
   gbif_colls_url <- "https://api.gbif.org/v1/external/idigbio/collections"
 
-  # For now let's just load a local copy of the old file.
-  f <- file("data/idigbio_colls_old.json")
+  # Let's use the static file we downloaded from gbif
+  f <- file("data/sample_gbif_colls.json")
   
   colls <- fromJSON(f) %>% select("institution", "collection", "lat", "lon", "collection_uuid",
                                   "collection_url", "recordsets", "recordsetQuery", "UniqueNameUUID")
@@ -32,12 +32,22 @@ loadCollData <- function() {
   return(colls)
 }
 
-cleanCollections <- function(collsJson) {
-  # Convert empty values for "recordsetQuery" and UniqueNameUUID to null values
-  collsJson[collsJson$recordsetQuery == "", ]$recordsetQuery <- NA
-  collsJson[collsJson$UniqueNameUUID == "", ]$UniqueNameUUID <- NA
-  return(collsJson)
+# Convert empty string values for "recordsetQuery" and UniqueNameUUID to null
+# values.  I don't think this happens in GBIF data, but we'll make sure.
+cleanCollections <- function(colls) {
+  # This test prevents an error in assigning a replacement with 1 row to
+  # a slice with no rows
+  hasEmptyRsq <- sum(colls$recordsetQuery %in% "") > 0
+  if (hasEmptyRsq) {
+    colls[colls$recordsetQuery %in% "", ]$recordsetQuery <- NA
+  }
+  hasEmptyUnu <- sum(colls$UniqueNameUUID %in% "") > 0
+  if (hasEmptyUnu) {
+    colls[colls$UniqueNameUUID %in% "", ]$UniqueNameUUID <- NA
+  }
+  return(colls)  
 }
+
 
 addFundingType <- function(collsJson) {
   # Create a "type" field to indicate whether the collection is published
@@ -72,34 +82,55 @@ addCollPortalUrl <- function(collsJson) {
 # Actually, the converse is also true, but in those cases, we trust
 # the record set query will select only the relevant records, e.g. the query
 # "{\"recordset\":\"7450a9e3-ef95-4f9e-8260-09b498d2c5e6\",\"collectioncode\":\"ECON\"}"
-loadRecordCounts <- function(collsJson) {
+loadRecordCounts <- function(colls) {
   # For now, just use a static file
-  # for (i in seq_along(collsJson$recordsetQuery)) {
-  #   
-  #   rsq <- collsJson$recordsetQuery[i]
-  #   if (is.na(rsq)) {
-  #     collsJson$size[i] <- 0
-  #   }
-  #   else {
-  #     if (is.data.frame(fromJSON(rsq))) {
-  #       collsJson$size[i] <- getCount(rsq)
-  #     }
-  #     else {
-  #       collsJson$size[i] <- idig_count_records(fromJSON(rsq))
-  #     }
-  #   }
-  # }
-  collsJson <- loadRecordCountsFromFile(collsJson)
-  return(collsJson)
+  colls <- loadRecordCountsFromFile(colls)
+  
+  # But augment it with results counts from the search API
+  # when the file lacks data for the collection
+  colls <- updateMissingCounts(colls)
+  
+  return(colls)
 }
 
-loadRecordCountsFromFile <- function(collData) {
+# This will merge counts into colls from a static file, which may not have data
+# for every collection.  The merge will put nulls in the "size"field for those.
+loadRecordCountsFromFile <- function(colls) {
   collUuidsToCounts <- read.csv("data/coll_uuid_to_counts.csv", stringsAsFactors = F)
-  df <- merge(x = collData,
-        y = collUuidsToCounts[, c("collection_uuid", "size")],
-        by = "collection_uuid"
-        )
+  df <- merge(
+    x = colls,
+    y = collUuidsToCounts[, c("collection_uuid", "size")],
+    by = "collection_uuid",
+    all.x = T
+    )
+  
   return(df)
+}
+
+# If colls has null in its "size" field, do a query based on its recordsetQuery
+# field.  If that field doesn't exist, set size to 0.
+updateMissingCounts <- function(colls) {
+  for (i in seq_along(colls$recordsetQuery)) {
+
+    recs <- colls$size[i]
+    if (! is.na(recs)) {
+      next
+    }
+    
+    rsq <- colls$recordsetQuery[i]
+    if (is.na(rsq)) {
+      colls$size[i] <- 0
+    }
+    else {
+      if (is.data.frame(fromJSON(rsq))) {
+        colls$size[i] <- getCount(rsq)
+      }
+      else {
+        colls$size[i] <- idig_count_records(fromJSON(rsq))
+      }
+    }
+  }
+  return(colls)
 }
 
 getCount <- function(recordQueries) {
