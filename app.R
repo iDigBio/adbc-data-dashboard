@@ -271,12 +271,21 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
 
   ### Collections Map ###
+  
+  # This is an outline-based Plotly "geo map"
+  # https://plotly.com/r/map-configuration/
   output$plot1 <- renderPlotly({
     # Map it!
     # geo styling
     g <- list(
-      scope = "usa",
-      projection = list(type = "albers usa"),
+      # Uncomment these two lines to show the US
+      #scope = "usa",
+      #projection = list(type = "albers usa"),
+
+      # Uncomment this line to show the world
+      # Note that we have collections in Guam.
+      scope = "world",
+      
       showland = TRUE,
       landcolor = toRGB("gray95"),
       subunitcolor = toRGB("gray85"),
