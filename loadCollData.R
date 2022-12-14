@@ -1,4 +1,8 @@
-#
+library(rvest)
+library(dplyr)
+library(jsonlite)
+library(ridigbio)
+
 loadCollData <- function() {
   # This is the old file, which was updated manually until four years ago when that person left
   idigbio_colls_url <- "http://idigbio.github.io/idb-us-collections/collections.json"
@@ -401,4 +405,35 @@ loadDashboardWikiMenuItems <- function(wikiUrl) {
     apply(mItems, 1, function(row) {
       menuSubItem(row[["pages"]], href = row[["links"]])
     })
+}
+
+# Scrape the idigbio wiki Data Ingest Report for a list
+# of collections (? verify w/ Dan) and dates of ingest
+# Columns:  redmine/name, contact, date submitted, date ingested
+loadRecentDatasetsFromWiki <- function() {
+  
+  reportUrl <- "https://www.idigbio.org/wiki/index.php/Data_Ingestion_Report"
+
+  h <- read_html("data/Data_Ingestion_Report-20221213.htm")
+  
+  # Create an empty dataframe with columns named by these html table headings
+  # (Some past years also have columns for the number of datasets/organisms)
+  cols <- c("Redmine/Data Source", "Contact", "Submitted", "Accepted", "Ingested")
+  no_rows <- matrix(nrow = 0, ncol = length(cols))
+  colnames(no_rows) <- cols
+  df <- data.frame(no_rows)
+  
+  # Append each year's table to the bottom of the dataframe
+  for (year in 2014:2022) {
+    path <-
+      paste0("//span[@id='Data_Ingested_During_", year, "']/following::table[1]")
+    
+    new_rows <- html_element(h, xpath=path) %>%
+      html_table(convert = F) %>%
+      select(all_of(cols))
+    
+    df <- rbind(df, new_rows)
+  }
+
+  # The ingestion queue follows the same pattern, but with id="Ingestion_queue"
 }
