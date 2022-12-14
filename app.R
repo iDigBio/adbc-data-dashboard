@@ -1,13 +1,10 @@
 library(shiny)
 library(shinydashboard)
-library(jsonlite)
 library(plotly)
-library(rvest)
-library(ridigbio)
-library(dplyr)
 
 # This file handles all of the RSS parsing
 source("rss.R")
+
 source("loadCollData.R")
 
 # This script uses the iDigBio collections JSON endpoint:
