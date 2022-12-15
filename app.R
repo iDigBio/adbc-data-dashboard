@@ -18,16 +18,47 @@ source("loadCollData.R")
 # https://api.gbif.org/v1/external/idigbio/collections
 colls <- loadCollData()
 
-# Funding types: these will be used in the map to select layers on the map
-# They come from presence/absence of fields recordsetQuery (is publishing)
-# UniqueNameUUID (is funded).  The types are:
-# "Publishing data", "Unfunded collections (not publishing)", and
-# "Funded participants (not publishing)"
-fundingTypes <- unique(colls$type)
+# Substitute null for empty strings in recordsetQuery and UniqueNameUUID;
+colls$recordsetQuery <- na_if(colls$recordsetQuery, "")
+colls$UniqueNameUUID <- na_if(colls$UniqueNameUUID, "")
+
+# Funding type  will be used in the map to select layers.
+publishing <- "Publishing data"
+unfunded <- "Unfunded collections (not publishing)"
+funded <- "Funded participants (not publishing)"
+
+fundingTypes <- c(funded, publishing, unfunded)
+
+# If there is a recordsetQuery value, they're publishing.
+# Overwrite this value if appropriate in the next steps.
+colls <- cbind(colls, fundingType = publishing)
+
+colls[is.na(colls$recordsetQuery) & # No recordsetQuery: not publishing.
+        is.na(colls$UniqueNameUUID), ]$fundingType <- unfunded
+
+colls[is.na(colls$recordsetQuery) & # No UniqueNameUUID: not funded.
+        ! is.na(colls$UniqueNameUUID), ]$fundingType <- funded
+
+# Use ridigbio to query the search API to obtain record counts for
+# collections that didn't have counts in the static files
+colls[is.na(colls$size), ]$size <-
+  sapply(colls[is.na(colls$size), ]$recordsetQuery, fetchMissingCount)
+
+# Add a column "coll_portal_url" generated from the collection_uuid value
+colls <- cbind(colls,
+               coll_portal_url = paste0(
+                 "https://www.idigbio.org/portal/collections/",
+                 gsub("urn:uuid:", "", colls$collection_uuid)
+               ))
+
+# Add an idx column; this is for looking up the row from a click event
+colls <- cbind(colls, idx = as.numeric(row.names(colls)))
+
 
 ####################################################
-# Number of specimen-based datasets in the iDigBio IPT
-# Number of specimen-based datasets in the VertNet IPT
+# Number of specimen-based datasets published by iDigBio IPT
+# Number of specimen-based datasets published by VertNet IPT
+# iDigBio may or may not have ingested these yet
 
 # Number of <item> elements in the iDigBio IPT rss feed
 iDigBioIptDatasetCount <- loadIDigTotals()
@@ -45,11 +76,12 @@ knownUSCollectionsCount <- length(colls$collection)
 # https://github.com/iDigBio/idb-us-collections
 # "UniqueNameUUID this property is used by iDigBio staff to maintain a
 # hierarchical relationship between institutions and collections"
-adbcFundedCollectionsCount <- length(colls[!colls$UniqueNameUUID == "", ]$collection)
+adbcFundedCollectionsCount <- sum(colls$fundingType == funded)
 
-# 
-adbcFundedInstitutionsCount <- length(unique(colls[!colls$UniqueNameUUID == "", ]$UniqueNameUUID))
-collectionsProvidingDataCount <- length(colls[!is.na(colls$recordsetQuery), ]$collection)
+adbcFundedInstitutionsCount <- length(unique(colls$UniqueNameUUID))
+
+collectionsProvidingDataCount <-
+  length(colls[colls$fundingType == publishing, ]$collection)
 
 # This is the sum total of contributed data from US Collections
 totalAdbcSpecimenRecords <- sum(colls$size)
@@ -276,12 +308,12 @@ server <- function(input, output, session) {
     # geo styling
     g <- list(
       # Uncomment these two lines to show the US
-      #scope = "usa",
-      #projection = list(type = "albers usa"),
+      scope = "usa",
+      projection = list(type = "albers usa"),
 
       # Uncomment this line to show the world
       # Note that we have collections in Guam.
-      scope = "world",
+      #scope = "world",
       
       showland = TRUE,
       landcolor = toRGB("gray95"),
@@ -298,7 +330,7 @@ server <- function(input, output, session) {
       add_markers(
         text = ~ paste0(institution, "<br /> (", collection, ")"),
         hoverinfo = 'text',
-        color = ~ type,
+        color = ~ fundingType,
         symbol = I("circle"),
         size = I(8),
         key = ~ idx

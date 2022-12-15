@@ -3,9 +3,11 @@ library(dplyr)
 library(jsonlite)
 library(ridigbio)
 
+# Return institution, collection, lat, lon, collection_uuid, collection_url,
+# recordsets, recordsetQuery, UniqueNameUUID from call to GBIF GrSciColl API
 loadCollData <- function() {
-  # This is the old file, which was updated manually until four years ago when that person left
-  idigbio_colls_url <- "http://idigbio.github.io/idb-us-collections/collections.json"
+  # This is the old file, which was updated manually until four years ago
+  # idigbio_colls_url <- "http://idigbio.github.io/idb-us-collections/collections.json"
 
   # This is where the data lives now; it is managed by GBIF but we have our own API call
   gbif_colls_url <- "https://api.gbif.org/v1/external/idigbio/collections"
@@ -13,140 +15,58 @@ loadCollData <- function() {
   # Let's use the static file we downloaded from gbif
   f <- file("data/sample_gbif_colls.json")
   
-  colls <- fromJSON(f) %>% select("institution", "collection", "lat", "lon", "collection_uuid",
-                                  "collection_url", "recordsets", "recordsetQuery", "UniqueNameUUID")
+  colls <- fromJSON(f) %>%
+    select("institution", "collection", "lat", "lon", "collection_uuid",
+           "collection_url", "recordsets", "recordsetQuery", "UniqueNameUUID")
   
-  # Substitute null for empty strings in recordsetQuery and UniqueNameUUID;
-  colls <- cleanCollections(colls)
+  # Add a column "size" to indicate how many records in the collection.
   
-  # Add funding type field "type" w/ value in {"Publishing data",
-  # "Unfunded collections (not publishing)", "Funded participants (not publishing)"}
-  # Depends on recordsetQuery and UniqueNameUUID
-  colls <- addFundingType(colls)
+  # This file was created by running the recordsetQuery queries for every
+  # collection (1604 of them).
   
-  # Add a column "size" containing the number of records in the collection
-  colls <- loadRecordCounts(colls) 
-  
-  # Add a column "coll_portal_url"
-  colls <- addCollPortalUrl(colls)
-  
-  # Add an idx column; this is for looking up the row from a click event
-  colls <- cbind(colls, idx = as.numeric(row.names(colls)))
-
-  return(colls)
-}
-
-# Convert empty string values for "recordsetQuery" and UniqueNameUUID to null
-# values.  I don't think this happens in GBIF data, but we'll make sure.
-cleanCollections <- function(colls) {
-  # This test prevents an error in assigning a replacement with 1 row to
-  # a slice with no rows
-  hasEmptyRsq <- sum(colls$recordsetQuery %in% "") > 0
-  if (hasEmptyRsq) {
-    colls[colls$recordsetQuery %in% "", ]$recordsetQuery <- NA
-  }
-  hasEmptyUnu <- sum(colls$UniqueNameUUID %in% "") > 0
-  if (hasEmptyUnu) {
-    colls[colls$UniqueNameUUID %in% "", ]$UniqueNameUUID <- NA
-  }
-  return(colls)  
-}
-
-
-addFundingType <- function(collsJson) {
-  # Create a "type" field to indicate whether the collection is published
-  collsJson <- cbind(collsJson, type="")
-
-  # If there is a recordsetQuery value, we have data from these collections
-  collsJson[!is.na(collsJson$recordsetQuery), ]$type <- "Publishing data"
-  
-  # Otherwise we do not, assume they are unfunded
-  collsJson[is.na(collsJson$recordsetQuery), ]$type <-
-    "Unfunded collections (not publishing)"
-  # But if there is a non-empty UniqueNameUUID, assume they are funded, just not publishing
-  collsJson[is.na(collsJson$recordsetQuery) &
-              !is.na(collsJson$UniqueNameUUID), ]$type <-
-    "Funded participants (not publishing)"
-  return(collsJson)
-}
-
-addCollPortalUrl <- function(collsJson) {
-  # Add a coll_url column containing a collection link
-  collsJson %>%
-    mutate(coll_portal_url = paste0(
-      "https://www.idigbio.org/portal/collections/",
-      gsub("urn:uuid:", "", collection_uuid)
-    ))
-}
-
-
-
-# Add a column "size" to indicate how many records in the collection,
-# allowing for collections to be composed of multiple record sets.
-# Actually, the converse is also true, but in those cases, we trust
-# the record set query will select only the relevant records, e.g. the query
-# "{\"recordset\":\"7450a9e3-ef95-4f9e-8260-09b498d2c5e6\",\"collectioncode\":\"ECON\"}"
-loadRecordCounts <- function(colls) {
-  # For now, just use a static file
-  colls <- loadRecordCountsFromFile(colls)
-  
-  # But augment it with results counts from the search API
-  # when the file lacks data for the collection
-  colls <- updateMissingCounts(colls)
-  
-  return(colls)
-}
-
-# This will merge counts into colls from a static file, which may not have data
-# for every collection.  The merge will put nulls in the "size"field for those.
-loadRecordCountsFromFile <- function(colls) {
+  # Note that collection record counts do change from time to time, so the
+  # file should be updated regularly.
   collUuidsToCounts <- read.csv("data/coll_uuid_to_counts.csv", stringsAsFactors = F)
-  df <- merge(
+  colls <- merge(
     x = colls,
     y = collUuidsToCounts[, c("collection_uuid", "size")],
     by = "collection_uuid",
     all.x = T
-    )
+  )
   
-  return(df)
-}
-
-# If colls has null in its "size" field, do a query based on its recordsetQuery
-# field.  If that field doesn't exist, set size to 0.
-updateMissingCounts <- function(colls) {
-  for (i in seq_along(colls$recordsetQuery)) {
-
-    recs <- colls$size[i]
-    if (! is.na(recs)) {
-      next
-    }
-    
-    rsq <- colls$recordsetQuery[i]
-    if (is.na(rsq)) {
-      colls$size[i] <- 0
-    }
-    else {
-      if (is.data.frame(fromJSON(rsq))) {
-        colls$size[i] <- getCount(rsq)
-      }
-      else {
-        colls$size[i] <- idig_count_records(fromJSON(rsq))
-      }
-    }
-  }
   return(colls)
 }
 
-getCount <- function(recordQueries) {
-  counts_list <- c()
-  rq_list = fromJSON(recordQueries, simplifyVector = F)
-  for (i in 1:length(rq_list)) {
-    query_counts <-
-      idig_count_records(rq = rq_list[[i]])
-    counts_list <- c(counts_list, query_counts)
+# Some examples of recordsetQuery values:
+# rsq1 <- "{\"recordset\":\"7450a9e3-ef95-4f9e-8260-09b498d2c5e6\",\"collectioncode\":\"ECON\"}"
+# rsq2 <- "{\"recordset\":[\"2eb8ff2f-4826-4fc3-be68-22d805bcae88\",\"d6c6e57a-4ccb-4707-b87d-c91d01d6aa42\",\"0bc60df1-a162-4173-9a73-c51e09031843\"]}"
+# rsq3 <- "{\"recordset\":\"5ace330b-5888-4a46-a5ac-e428535ed4f3\"}"
+# rsq4 <- "[{\"recordset\":\"e40bcf8a-0d64-4d88-a02d-fa047b195e8b\"},{\"recordset\":\"5975bbda-cd92-4084-8a09-ce1e28e6164f\",\"institutioncode\":\"osac\"}]"
+# rsq5 <- "[{\"recordset\":\"e73fedf0-90ee-4c6d-88dd-49399878fc54\"},{\"recordset\":\"5975bbda-cd92-4084-8a09-ce1e28e6164f\",\"institutioncode\":\"ansp\"}]"
+# rsq6 <- "{\"recordset\":[\"e48bb88f-9594-461e-8230-522a3a5572fe\"]}"
+
+# Query the search API for each item in the list represented by rsqString.
+# Return 0 if rsqString is NA.
+fetchMissingCount <- function(rsqString) {
+  
+  if (is.na(rsqString)) {
+    return(0)
   }
   
-  sum(counts_list)
+  # Make singleton json objects into lists to eliminate edge case
+  if (substring(rsqString, 1, 1) != "[") {
+    rsqString <- paste0("[", rsqString, "]")
+  }
+  
+  # Iterate over list of queries, calling search API on each
+  countsList <- c()
+  rqList = fromJSON(rsqString, simplifyVector = F)
+  for (i in 1:length(rqList)) {
+    queryCounts <-
+      idig_count_records(rq = rqList[[i]])
+    countsList <- c(countsList, queryCounts)
+  }
+  return(sum(countsList))
 }
 
 loadIDigTotals <- function() {
@@ -161,13 +81,60 @@ loadVertNetTotals <- function() {
   length(feed$items)
 }
 
-countItemsInRss <- function(rssUrl) {
-  # For now, we'll just hard-code these
-  # We could read them from sample files sample_idigbio_rss.xml and
-  # sample_vertnet_rss.xml
-  
-  # Return this value if we are fetching rss
-  
+# Select Symbiota record set uuids on the basis of having "collicon" in data.logo_url field
+selectSymbiotaRecordsets <- function(rsets) {
+  rsets[grepl("collicon", rsets$data.logo_url), ]
+}
+
+# Select collections on the basis of having one of these record set uuid in the recordsets field
+selectCollectionsByRSUuid <- function(collData, rsUuids) {
+  collData %>% filter(recordsets %in% rsUuids) 
+}
+
+countSymbiotaColls <- function(collData) {
+  # ProgreSQL un-deleted recordset objects as published via the search API
+  apiDatasetData <- loadApiDatasetsData()
+  # It's a Symbiota recordset if it has "collicon" data.logo_url
+  symbiotaRSUuids <- selectSymbiotaRecordsets(apiDatasetData)$uuid
+  # It's a Symbiota collection if there is a Symbiota recordset associated with the collection
+  symbiotaColls <- selectCollectionsByRSUuid(collData, symbiotaRSUuids)
+  # Count the rows
+  nrow(symbiotaColls)
+}
+
+countSymbiotaDatasets <- function() {
+  # ProgreSQL un-deleted recordset objects as published via the search API
+  apiDatasetData <- loadApiDatasetsData()
+  # It's a Symbiota recordset if it has "collicon" data.logo_url
+  symbiotaRecordsets <- selectSymbiotaRecordsets(apiDatasetData)
+  # Count rows 
+  nrow(symbiotaRecordsets)
+}
+
+# Select Specify record set uuids on the basis of having "specify" in data.eml_link field
+selectSpecifyRecordsets <- function(apiDatasetData) {
+  apiDatasetData[grepl("specify", apiDatasetData$data.eml_link), ]
+}
+
+# Select collections on the basis of having a Specify record set uuid in the recordsets field
+countSpecifyColls <- function(collData) {
+  # ProgreSQL un-deleted recordset objects as published via the search API
+  apiDatasetData <- loadApiDatasetsData()
+  # It's a Specify recordset if it has "specify" data.eml_link
+  specifyRSUuids <- selectSpecifyRecordsets(apiDatasetData)$uuid
+  # It's a Specify collection if there is a Specify recordset associated with the collection
+  specifyColls <- selectCollectionsByRSUuid(collData, specifyRSUuids)
+  # Count the rows
+  nrow(specifyColls)
+}
+
+countSpecifyDatasets <- function() {
+  # ProgreSQL un-deleted recordset objects as published via the search API
+  apiDatasetData <- loadApiDatasetsData()
+  # It's a Symbiota recordset if it has "collicon" data.logo_url
+  specifyRecordsets <- selectSpecifyRecordsets(apiDatasetData)
+  # Count rows 
+  nrow(specifyRecordsets)
 }
 
 # Data had been here:
@@ -184,12 +151,7 @@ loadNewDatasetsData <- function() {
   #   )
   f <- file("data/fresh-recordsets-report.old.tsv")
   tsv <-
-    read.csv(
-      f,
-      stringsAsFactors = F,
-      sep = "\t",
-      header = F
-    )
+    read.csv(f, stringsAsFactors = F, sep = "\t", header = F)
   names(tsv) <-
     c(
       'uuid',
@@ -251,14 +213,6 @@ loadNewAndRecentDatasetsData <- function() {
   
 }
 
-urlForPublisher <- function(publisherUuid) {
-  paste0(
-    "https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:%22",
-    publisherUuid,
-    "%22}"
-  )
-}
-
 # For now, use static list of publishers
 publishers <- fromJSON(file("data/api_publishers.json"), flatten = T)
 
@@ -313,61 +267,6 @@ getPublisherChoiceList <- function(newDatasets) {
   return(choices)
 }
 
-# Select Symbiota record set uuids on the basis of having "collicon" in data.logo_url field
-selectSymbiotaRecordsets <- function(apiDatasetData) {
-  apiDatasetData[grepl("collicon", apiDatasetData$data.logo_url), ]
-}
-
-# Select collections on the basis of having one of these record set uuid in the recordsets field
-selectCollectionsByRSUuid <- function(collData, rsUuids) {
-  collData %>% filter(recordsets %in% rsUuids) 
-}
-
-countSymbiotaColls <- function(collData) {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  symbiotaRSUuids <- selectSymbiotaRecordsets(apiDatasetData)$uuid
-  # It's a Symbiota collection if there is a Symbiota recordset associated with the collection
-  symbiotaColls <- selectCollectionsByRSUuid(collData, symbiotaRSUuids)
-  # Count the rows
-  nrow(symbiotaColls)
-}
-
-countSymbiotaDatasets <- function() {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  symbiotaRecordsets <- selectSymbiotaRecordsets(apiDatasetData)
-  # Count rows 
-  nrow(symbiotaRecordsets)
-}
-
-# Select Specify record set uuids on the basis of having "specify" in data.eml_link field
-selectSpecifyRecordsets <- function(apiDatasetData) {
-  apiDatasetData[grepl("specify", apiDatasetData$data.eml_link), ]
-}
-
-# Select collections on the basis of having a Specify record set uuid in the recordsets field
-countSpecifyColls <- function(collData) {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Specify recordset if it has "specify" data.eml_link
-  specifyRSUuids <- selectSpecifyRecordsets(apiDatasetData)$uuid
-  # It's a Specify collection if there is a Specify recordset associated with the collection
-  specifyColls <- selectCollectionsByRSUuid(collData, specifyRSUuids)
-  # Count the rows
-  nrow(specifyColls)
-}
-
-countSpecifyDatasets <- function() {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  specifyRecordsets <- selectSpecifyRecordsets(apiDatasetData)
-  # Count rows 
-  nrow(specifyRecordsets)
-}
 
 
 # Scrape the github repo wiki for menu items
