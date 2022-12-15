@@ -29,8 +29,6 @@ funded <- "Funded participants (not publishing)"
 
 fundingTypes <- c(funded, publishing, unfunded)
 
-# If there is a recordsetQuery value, they're publishing.
-# Overwrite this value if appropriate in the next steps.
 colls <- cbind(colls, fundingType = publishing)
 
 colls[is.na(colls$recordsetQuery) & # No recordsetQuery: not publishing.
@@ -83,17 +81,22 @@ adbcFundedInstitutionsCount <- length(unique(colls$UniqueNameUUID))
 collectionsProvidingDataCount <-
   length(colls[colls$fundingType == publishing, ]$collection)
 
-# This is the sum total of contributed data from US Collections
+# This is the sum total of recordset counts from US Collections
 totalAdbcSpecimenRecords <- sum(colls$size)
 
 ############################
 # From our recordset data, can we tell how many come from Specify and Symbiota?
 
-# Depends on search API recordset data.logo_url and coll data recordsets column
-symbiotaDatasetCount <- countSymbiotaDatasets()
+rsets <- loadRecordsets()
 
-# Depends on search API recordset data.eml_link and coll data recordsets column
-specifyCloudDatasetCount <- countSpecifyDatasets()
+# It's a Symbiota recordset if it has "collicon" data.logo_url
+symbiotaDatasetCount <-
+  nrow(rsets[grepl("collicon", rsets$data.logo_url), ])
+
+# It's a SpecifyCould recordset if it has "specify" in data.eml_link field
+specifyCloudDatasetCount <-
+  nrow(rsets[grepl("specify", rsets$data.eml_link), ])
+
 
 
 #####################################################
@@ -108,7 +111,7 @@ specifyCloudDatasetCount <- countSpecifyDatasets()
 # publishers (except VertNet).  Table returned has
 # columns name, publisher_uuid, file_link, first_seen,
 # and 'pub_date'.
-newDatasets <- loadNewAndRecentDatasetsData()
+newDatasets <- loadNewAndRecentDatasetsData(rsets)
 
 # Retrieve publisher names from search.idigbio for each publisher uuid
 # in our new datasets file;  sort the publishers in decreasing order of

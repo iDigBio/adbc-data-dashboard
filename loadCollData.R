@@ -81,60 +81,13 @@ loadVertNetTotals <- function() {
   length(feed$items)
 }
 
-# Select Symbiota record set uuids on the basis of having "collicon" in data.logo_url field
-selectSymbiotaRecordsets <- function(rsets) {
-  rsets[grepl("collicon", rsets$data.logo_url), ]
-}
-
-# Select collections on the basis of having one of these record set uuid in the recordsets field
-selectCollectionsByRSUuid <- function(collData, rsUuids) {
-  collData %>% filter(recordsets %in% rsUuids) 
-}
-
-countSymbiotaColls <- function(collData) {
+loadRecordsets <- function() {
   # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  symbiotaRSUuids <- selectSymbiotaRecordsets(apiDatasetData)$uuid
-  # It's a Symbiota collection if there is a Symbiota recordset associated with the collection
-  symbiotaColls <- selectCollectionsByRSUuid(collData, symbiotaRSUuids)
-  # Count the rows
-  nrow(symbiotaColls)
-}
+  # https://search.idigbio.org/v2/search/recordsets?limit=3000
 
-countSymbiotaDatasets <- function() {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  symbiotaRecordsets <- selectSymbiotaRecordsets(apiDatasetData)
-  # Count rows 
-  nrow(symbiotaRecordsets)
-}
-
-# Select Specify record set uuids on the basis of having "specify" in data.eml_link field
-selectSpecifyRecordsets <- function(apiDatasetData) {
-  apiDatasetData[grepl("specify", apiDatasetData$data.eml_link), ]
-}
-
-# Select collections on the basis of having a Specify record set uuid in the recordsets field
-countSpecifyColls <- function(collData) {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Specify recordset if it has "specify" data.eml_link
-  specifyRSUuids <- selectSpecifyRecordsets(apiDatasetData)$uuid
-  # It's a Specify collection if there is a Specify recordset associated with the collection
-  specifyColls <- selectCollectionsByRSUuid(collData, specifyRSUuids)
-  # Count the rows
-  nrow(specifyColls)
-}
-
-countSpecifyDatasets <- function() {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  apiDatasetData <- loadApiDatasetsData()
-  # It's a Symbiota recordset if it has "collicon" data.logo_url
-  specifyRecordsets <- selectSpecifyRecordsets(apiDatasetData)
-  # Count rows 
-  nrow(specifyRecordsets)
+    # For now, use static list of recordsets
+  rsets <- fromJSON(file("data/search_api_recordsets.json"), flatten = T)$items
+  return(rsets)
 }
 
 # Data had been here:
@@ -184,14 +137,7 @@ loadRecentDatasetsData <- function() {
   return(tsv)
 }
 
-# For now, use static list of recordsets
-# https://search.idigbio.org/v2/search/recordsets?limit=3000
-apiDatasets <- fromJSON(file("data/search_api_recordsets.json"), flatten = T)$items
-loadApiDatasetsData <- function() {
-  return(apiDatasets)
-}
-
-loadNewAndRecentDatasetsData <- function() {
+loadNewAndRecentDatasetsData <- function(rsets) {
   newDatasets <- loadNewDatasetsData()
   recentDatasets <- loadRecentDatasetsData()
   
@@ -203,13 +149,9 @@ loadNewAndRecentDatasetsData <- function() {
   newDatasets <-
     rbind(recentDatasets, newRows) %>% filter(!publisher_uuid == vertNetUuid)
   
-  # List un-deleted ingested record sets from Postgres
-  # For the time being, read this from a static file.
-  apiDatasets <- loadApiDatasetsData()
-  
   # Remove record sets that match a file link in the Postgres record set file links
   newDatasets <-
-    newDatasets[!newDatasets$file_link %in% apiDatasets$indexTerms.indexData.link, ]
+    newDatasets[!newDatasets$file_link %in% rsets$indexTerms.indexData.link, ]
   
 }
 
