@@ -3,6 +3,9 @@ library(dplyr)
 library(jsonlite)
 library(ridigbio)
 
+# This file handles all of the RSS parsing
+source("rss.R")
+
 # Return institution, collection, lat, lon, collection_uuid, collection_url,
 # recordsets, recordsetQuery, UniqueNameUUID from call to GBIF GrSciColl API
 loadCollData <- function() {
@@ -93,10 +96,9 @@ loadRecordsets <- function() {
 # Data had been here:
 # https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt
 
-# Presumably this is intended to be a list of record sets that have been slated for ingestion
-# but not yet processed.  This data now lives in a different format on a manually
-# updated wiki page here: https://www.idigbio.org/wiki/index.php/Data_Ingestion_Report
-loadNewDatasetsData <- function() {
+# This is a list of record sets that have been slated for ingestion but not yet
+# processed, according to an exported Postgres query.
+loadFreshRecordsets <- function() {
   # n <-
   #   getURL(
   #     "https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv",
@@ -123,18 +125,59 @@ loadNewDatasetsData <- function() {
   return(tsv)
 }
 
-# Presumably this is a list of record sets actually ingested recently.  This data is
-# also in Data_Ingestion_Report these days
-loadRecentDatasetsData <- function() {
-  # m  <-
-  #   getURL(
-  #     "https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt",
-  #     ssl.verifypeer = TRUE
-  #   )
+# These recordsets correspond to <item>s in the known publisher rss feeds.  It's
+# a bit tricky but we'll assume that if there's an <item> with a <title> value
+# not already seen for this publisher, then it's a new recordset.  Again we will
+# omit the publisher VertNet from consideration; their counts are broken out
+# separately.
+loadNewlyPublishedRecordsets <- function(publishers) {
+  #oldUrl <-
+  #  "https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt"
+
   f <- file("data/datasets_new_last360days.old.txt")
   tsv <-
     read.csv(f, stringsAsFactors = F, sep = "\t") %>% select(name:pub_date)
   return(tsv)
+}
+
+fetchRecordsetsFromPublishers <- function(publishers) {
+  # Create an empty dataframe.
+  cols <- c(
+    "name", "publisher_uuid", "file_link", "pub_date"
+  )
+  no_rows <- matrix(nrow = 0, ncol = length(cols))
+  colnames(no_rows) <- cols
+  recsets <- data.frame(no_rows)
+  
+  # Iterate over publishers
+  for (i in 49:nrow(publishers$items)) {
+    
+    # Fetch the rss
+    pubUuid <- publishers$items[i, "uuid"]
+    print(paste("working on ", pubUuid))
+    
+    feed <- NULL
+    tryCatch({
+      rssUrl <- publishers$items[i, "data.rss_url"]
+      print(rssUrl)
+      feed <- getFeedFromUrl(rssUrl)
+    },
+    error=function(cond) {
+      feed <- NULL
+    })
+    if (is.null(feed)) next
+    
+    # Iterate over the <item>s, extracting title, link, and pubDate,
+    # and adding them into a new row in th dataframe.  Has to be a better way.
+    recsets <- rbind(recsets, data.frame(
+      name = sapply(feed$items, function(item) coalesce(item$title, "")),
+      publisher_uuid = sapply(feed$items, function(item) pubUuid),
+      file_link = sapply(feed$items, function(item) coalesce(item$link, "")),
+      pub_date = sapply(feed$items, function(item) coalesce(as.character(item$pubDate), ""))
+    ))
+  }
+  
+  return(recsets);
 }
 
 loadNewAndRecentDatasetsData <- function(rsets) {
@@ -144,7 +187,7 @@ loadNewAndRecentDatasetsData <- function(rsets) {
   # Append recently ingested data sets to the list of un-ingested data sets, removing dupes and VertNet
   newRows <- setdiff(newDatasets, recentDatasets)
   
-  # Do not include record sets published by VertNet for some reason
+  # Do not include record sets published by VertNet for some reason, ask about this
   vertNetUuid <- "e699547d-080e-431a-8d9b-3d56e39808f0"
   newDatasets <-
     rbind(recentDatasets, newRows) %>% filter(!publisher_uuid == vertNetUuid)
@@ -155,8 +198,6 @@ loadNewAndRecentDatasetsData <- function(rsets) {
   
 }
 
-# For now, use static list of publishers
-publishers <- fromJSON(file("data/api_publishers.json"), flatten = T)
 
 publisherByUuid <- function(pubUuid) {
   filt <- publishers$items$indexTerms.uuid == pubUuid

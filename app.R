@@ -2,9 +2,6 @@ library(shiny)
 library(shinydashboard)
 library(plotly)
 
-# This file handles all of the RSS parsing
-source("rss.R")
-
 source("loadCollData.R")
 
 # This script uses the iDigBio collections JSON endpoint:
@@ -70,10 +67,6 @@ vertNetIptDatasetCount <- loadVertNetTotals()
 # https://github.com/gbif/registry/blob/dev/registry-persistence/src/main/resources/org/gbif/registry/persistence/mapper/collections/external/IDigBioMapper.xml
 knownUSCollectionsCount <- length(colls$collection)
 
-# If the collection record has a UniqueNameUUID, we say it's funded
-# https://github.com/iDigBio/idb-us-collections
-# "UniqueNameUUID this property is used by iDigBio staff to maintain a
-# hierarchical relationship between institutions and collections"
 adbcFundedCollectionsCount <- sum(colls$fundingType == funded)
 
 adbcFundedInstitutionsCount <- length(unique(colls$UniqueNameUUID))
@@ -81,12 +74,12 @@ adbcFundedInstitutionsCount <- length(unique(colls$UniqueNameUUID))
 collectionsProvidingDataCount <-
   length(colls[colls$fundingType == publishing, ]$collection)
 
-# This is the sum total of recordset counts from US Collections
 totalAdbcSpecimenRecords <- sum(colls$size)
 
 ############################
-# From our recordset data, can we tell how many come from Specify and Symbiota?
+# Recordsets
 
+# These recordsets come from the search API
 rsets <- loadRecordsets()
 
 # It's a Symbiota recordset if it has "collicon" data.logo_url
@@ -97,21 +90,18 @@ symbiotaDatasetCount <-
 specifyCloudDatasetCount <-
   nrow(rsets[grepl("specify", rsets$data.eml_link), ])
 
+#############################
+# Publishers
 
-
-#####################################################
-# We need to know how many funded ADBC institutions
-# let's use the UniqueNameUUID
-
-#adbcInst <- length(unique(colls$UniqueNameUUID))
-
+# For now, use static list of publishers
+publishers <- fromJSON(file("data/api_publishers.json"), flatten = T)
 
 #####################################################
-# Build a report for NEW un-ingested data from known
-# publishers (except VertNet).  Table returned has
-# columns name, publisher_uuid, file_link, first_seen,
-# and 'pub_date'.
-newDatasets <- loadNewAndRecentDatasetsData(rsets)
+# Build a report for NEW un-ingested data from known  publishers (except
+# VertNet).  Table returned has columns name, publisher_uuid, file_link,
+# first_seen, and pub_date.  This is a file exported from a Postgres query
+# over the last 360 days, joined with ... something.
+newRSets <- loadFreshRecordsets()
 
 # Retrieve publisher names from search.idigbio for each publisher uuid
 # in our new datasets file;  sort the publishers in decreasing order of
