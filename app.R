@@ -15,24 +15,27 @@ source("loadCollData.R")
 # https://api.gbif.org/v1/external/idigbio/collections
 colls <- loadCollData()
 
-# Substitute null for empty strings in recordsetQuery and UniqueNameUUID;
+# Substitute null for empty strings in recordsetQuery and UniqueNameUUID
+# to make sure our counts based on nulls/not come out correctly
 colls$recordsetQuery <- na_if(colls$recordsetQuery, "")
 colls$UniqueNameUUID <- na_if(colls$UniqueNameUUID, "")
 
 # Funding type  will be used in the map to select layers.
 publishing <- "Publishing data"
 unfunded <- "Unfunded collections (not publishing)"
-funded <- "Funded participants (not publishing)"
+fundedNotPublishing <- "Funded participants (not publishing)"
 
-fundingTypes <- c(funded, publishing, unfunded)
+fundingTypes <- c(fundedNotPublishing, publishing, unfunded)
 
+# The coll is publishing if it has a recordsetQuery field; the cases in which it
+# is not publishing are exhausted in the next two lines
 colls <- cbind(colls, fundingType = publishing)
 
 colls[is.na(colls$recordsetQuery) & # No recordsetQuery: not publishing.
         is.na(colls$UniqueNameUUID), ]$fundingType <- unfunded
 
 colls[is.na(colls$recordsetQuery) & # No UniqueNameUUID: not funded.
-        ! is.na(colls$UniqueNameUUID), ]$fundingType <- funded
+        ! is.na(colls$UniqueNameUUID), ]$fundingType <- fundedNotPublishing
 
 # Use ridigbio to query the search API to obtain record counts for
 # collections that didn't have counts in the static files
@@ -53,19 +56,20 @@ colls <- cbind(colls, idx = as.numeric(row.names(colls)))
 ####################################################
 # Number of specimen-based datasets published by iDigBio IPT
 # Number of specimen-based datasets published by VertNet IPT
-# iDigBio may or may not have ingested these yet
+# NOTE: these counts are made from the publishers' rss feeds,
+# iDigBio may or may not have ingested these yet.
 iDigBioIptDatasetCount <- loadIDigTotals()
 
 vertNetIptDatasetCount <- loadVertNetTotals()
 
-# Known US Collections: this counts all the collections found in our collections
-# resource on the GBIF Registry.  https://github.com/gbif/registry/issues/229
+# Known US Collections: this counts all the collections found in our dedicated
+# resource on the GBIF Registry.  See https://github.com/gbif/registry/issues/229
 # GBIF lists a collection under the /idigbio/collections url if the collection
 # has a machine tag "CollectionUUID" in the iDigBIo namespace "iDigBIo.org"
 # https://github.com/gbif/registry/blob/dev/registry-persistence/src/main/resources/org/gbif/registry/persistence/mapper/collections/external/IDigBioMapper.xml
 knownUSCollectionsCount <- length(colls$collection)
 
-adbcFundedCollectionsCount <- sum(colls$fundingType == funded)
+adbcFundedCollectionsCount <- sum(! is.na(colls$UniqueNameUUID))
 
 adbcFundedInstitutionsCount <- length(unique(colls$UniqueNameUUID))
 
@@ -77,7 +81,7 @@ totalAdbcSpecimenRecords <- sum(colls$size)
 ############################
 # Recordsets
 
-# These recordsets come from the search API
+# These recordsets come from a query to the iDigBio search API
 rsets <- loadRecordsets()
 
 # It's a Symbiota recordset if it has "collicon" data.logo_url, uuid
@@ -110,8 +114,8 @@ publishingUuids <- merge(
 newDatasetsByPublisher <- 
   plyr::count(publishingUuids, "publisher_uuid")
 
-# Get names and rss for the publishers from the search API
-publishers <- publishersByUuid(newDatasetsByPublisher$publisher_uuid)
+# Get names and rss for the publishers # newDatasetsByPublisher$publisher_uuid
+publishers <- loadPublishers()
 
 # Append names and sort by frequency and then name
 newDatasetsByPublisher <-
@@ -134,6 +138,7 @@ names(newDatasetsByPublisher) <- c("Publisher", "New Datasets")
 
 ############################################
 # Scrape the github repo wiki for menu items
+# These will go in our app's left nav pane
 wikiUrl <- "https://github.com/iDigBio/adbc-data-dashboard/wiki"
 dashboardWikiMenuItems <- loadDashboardWikiMenuItems(wikiUrl)
 
@@ -160,15 +165,15 @@ ui <- dashboardPage(
       menuItem(
         "Data Publisher Reports",
         icon = icon("th"),
-        tabName = "reports",
-        badgeLabel = "new",
-        badgeColor = "green"
+        tabName = "reports"
+        #badgeLabel = "new",
+        #badgeColor = "green"
       ),
       menuItem(
         "Collection Reports",
         icon = icon("th"),
         tabName = "collections",
-        badgeLabel = "new",
+        badgeLabel = "coming soon",
         badgeColor = "green"
       ),
       
@@ -313,18 +318,22 @@ server <- function(input, output, session) {
   
   # This is an outline-based Plotly "geo map"
   # https://plotly.com/r/map-configuration/
+  # https://plotly.com/python/reference/layout/geo/
   output$plot1 <- renderPlotly({
     # Map it!
     # geo styling
     g <- list(
       # Uncomment these two lines to show the US
-      scope = "usa",
-      projection = list(type = "albers usa"),
+      #scope = "usa",
+      #projection = list(type = "albers usa"),
 
-      # Uncomment this line to show the world
-      # Note that we have collections in Guam.
-      #scope = "world",
-      
+      # Uncomment these two lines to show Guam.  We have
+      # collections there, and American Samoa as well!
+      scope = "world",
+      projection =
+        list(type="orthographic",
+             rotation=list(lat=30, lon=210), roll=75),
+    
       showland = TRUE,
       landcolor = toRGB("gray95"),
       subunitcolor = toRGB("gray85"),
@@ -336,7 +345,7 @@ server <- function(input, output, session) {
     level.order <- fundingTypes
     
     ### Map point markers and mouseover ###
-    p <-  plot_geo(colls, lat = ~ lat, lon = ~ lon) %>%
+    p <-  plot_geo(colls[!is.na(colls$lat), ], lat = ~ lat, lon = ~ lon) %>%
       add_markers(
         text = ~ paste0(institution, "<br /> (", collection, ")"),
         hoverinfo = 'text',
@@ -394,7 +403,7 @@ server <- function(input, output, session) {
   ))
   df_rss <- reactive({
     uuidP <- input$dataset
-    rssUrl <- publishserRssUrlByUuid(uuidP)
+    rssUrl <- rssUrl <- publishers[publishers$uuid == uuidP,]$data.rss_url
     return(rssUrl)
   })
   output$datasetRSS <- renderPrint({
