@@ -54,10 +54,8 @@ colls <- cbind(colls, idx = as.numeric(row.names(colls)))
 # Number of specimen-based datasets published by iDigBio IPT
 # Number of specimen-based datasets published by VertNet IPT
 # iDigBio may or may not have ingested these yet
-
-# Number of <item> elements in the iDigBio IPT rss feed
 iDigBioIptDatasetCount <- loadIDigTotals()
-# Number of <item> elements in the VertNet IPT rss feed
+
 vertNetIptDatasetCount <- loadVertNetTotals()
 
 # Known US Collections: this counts all the collections found in our collections
@@ -82,7 +80,7 @@ totalAdbcSpecimenRecords <- sum(colls$size)
 # These recordsets come from the search API
 rsets <- loadRecordsets()
 
-# It's a Symbiota recordset if it has "collicon" data.logo_url
+# It's a Symbiota recordset if it has "collicon" data.logo_url, uuid
 symbiotaDatasetCount <-
   nrow(rsets[grepl("collicon", rsets$data.logo_url), ])
 
@@ -90,30 +88,49 @@ symbiotaDatasetCount <-
 specifyCloudDatasetCount <-
   nrow(rsets[grepl("specify", rsets$data.eml_link), ])
 
-#############################
-# Publishers
-
-# For now, use static list of publishers
-publishers <- fromJSON(file("data/api_publishers.json"), flatten = T)
-
 #####################################################
 # Build a report for NEW un-ingested data from known  publishers (except
 # VertNet).  Table returned has columns name, publisher_uuid, file_link,
 # first_seen, and pub_date.  This is a file exported from a Postgres query
-# over the last 360 days, joined with ... something.
-newRSets <- loadFreshRecordsets()
+# for recordsets first seen by ingest in the last (360) days.
+newDatasets <- loadFreshRecordsets()
 
-# Retrieve publisher names from search.idigbio for each publisher uuid
-# in our new datasets file;  sort the publishers in decreasing order of
-# new data sets.
-newDatasetsByPublisher <- createPublisherSummary(newDatasets)
+# Remove recordsets that have been ingested since the fresh-recordsets
+# query was exported.  We'll merge the two dataframes of recordsets on
+# file_link and publisher_uuid and filter out the matches.
+publishingUuids <- merge(
+  x = rsets %>% select(indexTerms.publisher, indexTerms.name, data.eml_link),
+  y = newDatasets %>% select(publisher_uuid, name, file_link),
+  by.x = "data.eml_link",
+  by.y = "file_link",
+  all.y = T
+  ) %>% select(publisher_uuid)
+
+# Get a count of rows per publisher_uuid, replace uuid with name.
+newDatasetsByPublisher <- 
+  plyr::count(publishingUuids, "publisher_uuid")
+
+# Get names and rss for the publishers from the search API
+publishers <- publishersByUuid(newDatasetsByPublisher$publisher_uuid)
+
+# Append names and sort by frequency and then name
+newDatasetsByPublisher <-
+  merge(x = newDatasetsByPublisher,
+        y = publishers,
+        by.x = "publisher_uuid",
+        by.y = "uuid") %>%
+  select(publisher_uuid, data.name, freq) %>%
+  arrange(desc(freq), data.name)
 
 # This is a named list of publisher uuids, using the publisher names.
 # It is used as the list of choices to select from when viewing the
-# table of new datasets by publisher.  It is ordered by decreasing
-# number of new datasets published by the publisher.
-publisherChoices <- getPublisherChoiceList(newDatasets)
+# table of new datasets by publisher.
+publisherChoices <- newDatasetsByPublisher$publisher_uuid
+names(publisherChoices) <- newDatasetsByPublisher$data.name
 
+# Remove the uuid column from the frequency table
+newDatasetsByPublisher <- newDatasetsByPublisher %>% select(data.name, freq)
+names(newDatasetsByPublisher) <- c("Publisher", "New Datasets")
 
 ############################################
 # Scrape the github repo wiki for menu items
@@ -356,7 +373,8 @@ server <- function(input, output, session) {
     a <-
       subset(newDatasets, publisher_uuid == uuidP) %>% select(-publisher_uuid)
     tryCatch({
-      a$contact <- fetchPublisherWebmasterByUuid(uuidP)
+      rssUrl <- publishers[publishers$uuid == uuidP,]$data.rss_url
+      a$contact <- fetchPublisherWebmasterByRssUrl(rssUrl)
     },
     error = function(cond) {
       return(a$contact <- NULL)

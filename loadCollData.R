@@ -84,17 +84,20 @@ loadVertNetTotals <- function() {
   length(feed$items)
 }
 
+# this is a list of ProgreSQL un-deleted recordset objects as published via the search API
 loadRecordsets <- function() {
-  # ProgreSQL un-deleted recordset objects as published via the search API
-  # https://search.idigbio.org/v2/search/recordsets?limit=3000
+  
+  # For testing, can use this static list of recordsets
+  #rsets <- fromJSON(file("data/search_api_recordsets.json"), flatten = T)$items
+  
+  rsets <-
+    fromJSON("https://search.idigbio.org/v2/search/recordsets?limit=3000",flatten = T)$items
+  
+  rsets <-
+    rsets %>% select(data.logo_url, data.eml_link, indexTerms.name, indexTerms.publisher)
 
-    # For now, use static list of recordsets
-  rsets <- fromJSON(file("data/search_api_recordsets.json"), flatten = T)$items
   return(rsets)
 }
-
-# Data had been here:
-# https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt
 
 # This is a list of record sets that have been slated for ingestion but not yet
 # processed, according to an exported Postgres query.
@@ -104,152 +107,31 @@ loadFreshRecordsets <- function() {
   #     "https://www.idigbio.org/sites/default/files/internal-docs/AC/fresh-recordsets-report.tsv",
   #     ssl.verifypeer = TRUE
   #   )
-  f <- file("data/fresh-recordsets-report.old.tsv")
-  tsv <-
-    read.csv(f, stringsAsFactors = F, sep = "\t", header = F)
-  names(tsv) <-
-    c(
-      'uuid',
-      'name',
-      'publisher_uuid',
-      'file_link',
-      'first_seen',
-      'pub_date',
-      'file_harvest_date'
-    )
-  
+  f <- file("data/fresh-recordsets-last-360-days_20221214.csv")
+  csv <-
+    read.csv(f, stringsAsFactors = F)
+
   # Do not include record sets published by VertNet for some reason
   vertNetUuid <- "e699547d-080e-431a-8d9b-3d56e39808f0"
-  tsv <-
-    tsv %>% select(name:pub_date) %>% filter(!publisher_uuid == vertNetUuid)
-  return(tsv)
-}
-
-# These recordsets correspond to <item>s in the known publisher rss feeds.  It's
-# a bit tricky but we'll assume that if there's an <item> with a <title> value
-# not already seen for this publisher, then it's a new recordset.  Again we will
-# omit the publisher VertNet from consideration; their counts are broken out
-# separately.
-loadNewlyPublishedRecordsets <- function(publishers) {
-  #oldUrl <-
-  #  "https://www.idigbio.org/sites/default/files/internal-docs/AC/datasets_new_last360days.txt"
-
-  f <- file("data/datasets_new_last360days.old.txt")
-  tsv <-
-    read.csv(f, stringsAsFactors = F, sep = "\t") %>% select(name:pub_date)
-  return(tsv)
-}
-
-fetchRecordsetsFromPublishers <- function(publishers) {
-  # Create an empty dataframe.
-  cols <- c(
-    "name", "publisher_uuid", "file_link", "pub_date"
-  )
-  no_rows <- matrix(nrow = 0, ncol = length(cols))
-  colnames(no_rows) <- cols
-  recsets <- data.frame(no_rows)
+  csv <-
+    csv %>% select(name:pub_date) %>% filter(!publisher_uuid == vertNetUuid)
   
-  # Iterate over publishers
-  for (i in 49:nrow(publishers$items)) {
-    
-    # Fetch the rss
-    pubUuid <- publishers$items[i, "uuid"]
-    print(paste("working on ", pubUuid))
-    
-    feed <- NULL
-    tryCatch({
-      rssUrl <- publishers$items[i, "data.rss_url"]
-      print(rssUrl)
-      feed <- getFeedFromUrl(rssUrl)
-    },
-    error=function(cond) {
-      feed <- NULL
-    })
-    if (is.null(feed)) next
-    
-    # Iterate over the <item>s, extracting title, link, and pubDate,
-    # and adding them into a new row in th dataframe.  Has to be a better way.
-    recsets <- rbind(recsets, data.frame(
-      name = sapply(feed$items, function(item) coalesce(item$title, "")),
-      publisher_uuid = sapply(feed$items, function(item) pubUuid),
-      file_link = sapply(feed$items, function(item) coalesce(item$link, "")),
-      pub_date = sapply(feed$items, function(item) coalesce(as.character(item$pubDate), ""))
-    ))
-  }
-  
-  return(recsets);
+  return(csv)
 }
 
-loadNewAndRecentDatasetsData <- function(rsets) {
-  newDatasets <- loadNewDatasetsData()
-  recentDatasets <- loadRecentDatasetsData()
-  
-  # Append recently ingested data sets to the list of un-ingested data sets, removing dupes and VertNet
-  newRows <- setdiff(newDatasets, recentDatasets)
-  
-  # Do not include record sets published by VertNet for some reason, ask about this
-  vertNetUuid <- "e699547d-080e-431a-8d9b-3d56e39808f0"
-  newDatasets <-
-    rbind(recentDatasets, newRows) %>% filter(!publisher_uuid == vertNetUuid)
-  
-  # Remove record sets that match a file link in the Postgres record set file links
-  newDatasets <-
-    newDatasets[!newDatasets$file_link %in% rsets$indexTerms.indexData.link, ]
-  
+publishersByUuid <- function(uuids) {
+  fromJSON(
+    paste0("https://search.idigbio.org/v2/search/publishers?pq={%22uuid%22:[%22",
+           paste0(uuids, collapse = "%22,%22"),
+           "%22]}"),
+    flatten = T)$items %>%
+    select(uuid, data.name, data.rss_url)
 }
 
-
-publisherByUuid <- function(pubUuid) {
-  filt <- publishers$items$indexTerms.uuid == pubUuid
-  if (sum(filt) == 1) {
-    matched <- publishers$items %>% filter(filt)
-    return(matched)
-  }
-  else {
-    return(NULL)
-  }
-}
-
-publisherNameByUuid <- function(pubUuid) {
-  p <- publisherByUuid(pubUuid)
-  p$indexTerms.name
-}
-
-publishserRssUrlByUuid <- function(pubUuid) {
-  publisher <- publisherByUuid(pubUuid)
-  rssUrl <- publisher$data.rss_url
-}
-
-fetchPublisherWebmasterByUuid <- function(pubUuid) {
-  rssUrl <- publishserRssUrlByUuid(pubUuid)
+fetchPublisherWebmasterByRssUrl <- function(rssUrl) {
   feed <- getFeedFromUrl(rssUrl)
   return(feed$header$webMaster)
 }
-
-createPublisherSummary <- function(newDatasets) {
-  pubSummary <- plyr::count(newDatasets, "publisher_uuid") %>%
-    rowwise() %>%
-    mutate(publisher = publisherNameByUuid(publisher_uuid)) %>%
-    select(publisher, freq) %>%
-    arrange(desc(freq))
-  
-  names(pubSummary) <- c("Publisher", "New Datasets")
-  return(pubSummary)
-}
-
-# Return a named list of publisher uuids sorted in order
-# of decreasing number of new datasets published
-getPublisherChoiceList <- function(newDatasets) {
-  p <- plyr::count(newDatasets, "publisher_uuid") %>%
-    arrange(desc(freq)) %>%
-    rowwise() %>%
-    mutate(publisher = publisherNameByUuid(publisher_uuid)) %>%
-    select(publisher, publisher_uuid)
-  choices <- p$publisher_uuid
-  names(choices) <- p$publisher
-  return(choices)
-}
-
 
 
 # Scrape the github repo wiki for menu items
@@ -318,4 +200,63 @@ loadRecentDatasetsFromWiki <- function() {
   }
 
   # The ingestion queue follows the same pattern, but with id="Ingestion_queue"
+}
+
+# This function takes as an argument a dataframe of publishers as loaded from
+# api_publishers.json, which was read from the search api list of all publishers.
+# The function polls the rss urls for all the publishers to get a list of recordsets.
+# It is not called in this application but I'll keep it here for reference.  This
+# dataframe it generates lists about twice as many recordsets as we have ingested.
+# Took about 10 min to fetch all the data on account of long default RCurl timeouts.
+fetchRecordsetsFromPublishers <- function(publishers) {
+  # Create an empty dataframe.
+  cols <- c(
+    "name", "publisher_uuid", "file_link", "pub_date"
+  )
+  no_rows <- matrix(nrow = 0, ncol = length(cols))
+  colnames(no_rows) <- cols
+  recsets <- data.frame(no_rows)
+  
+  # Iterate over publishers 
+  for (i in 1:nrow(publishers$items)) {
+    
+    # Fetch the rss
+    pubUuid <- publishers$items[i, "uuid"]
+    print(paste("working on ", pubUuid))
+    
+    feed <- NULL
+    tryCatch({
+      rssUrl <- publishers$items[i, "data.rss_url"]
+      print(rssUrl)
+      feed <- getFeedFromUrl(rssUrl)
+    },
+    error=function(cond) {
+      feed <- NULL
+    })
+    if (is.null(feed)) next
+    
+    # Iterate over the <item>s, extracting title, link, and pubDate,
+    # and adding them ass new rows in the dataframe.  Has to be a better way.
+    # (Yes, those are strings and not actual NA values; actual NA values
+    # confuse rbind.)
+    names_list <-sapply(feed$items,
+                        function(item) ifelse(is.null(item$title), "NA", item$title))
+    pub_uuid_list <- sapply(feed$items,
+                            function(item) pubUuid)
+    link_list <- sapply(feed$items,
+                        function(item) ifelse(is.null(item$link), "NA", item$link))
+    pub_date_list <-
+      sapply(feed$items,
+             function(item) ifelse(length(as.character(item$pubDate)) == 0, "NA", as.character(item$pubDate)))
+    
+    recsets <- rbind(recsets, data.frame(
+      name = names_list,
+      publisher_uuid = pub_uuid_list,
+      file_link = link_list,
+      pub_date = pub_date_list
+    ))
+  }
+  # Remove any rows containing an "NA" 
+  recsets <- filter(recsets, name != "NA" & publisher_uuid != "NA" & file_link != "NA" & pub_date != "NA")
+  return(recsets);
 }
