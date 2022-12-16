@@ -5,6 +5,18 @@ library(ridigbio)
 
 source("rss.R")
 
+# Recordsets published by VertNet are a special case regarding counts
+VertNetUuid <- "e699547d-080e-431a-8d9b-3d56e39808f0"
+
+# Static data
+collsJsonPath          <- "data/gbif_colls_20221213.json"
+collsRsetCountsCsvPath <- "data/coll_uuid_to_counts_20221213.csv"
+idbRssPath             <- "data/idigbio_ipt_rss_20221213.xml"
+vertNetRssPath         <- "data/vertnet_ipt_rss_20221213.xml"
+idbApiRsetsJsonPath    <- "data/idb_api_recordsets_20221213.json"
+idbApiPubsJsonPath     <- "data/idb_api_publishers_20221213.json"
+freshRsetsCsvPath      <- "data/fresh-recordsets-last-360-days_20221214.csv"
+
 #' Read a JSON file of all iDigBio collections in GBIF's GrSciColl Registry.
 #' Then merge in counts of recordsets per collection from another file.
 #' 
@@ -22,7 +34,7 @@ loadCollData <- function() {
   
   # The call to the web service takes a minute to download the data, so I saved
   # the results in this file.
-  f <- file("data/gbif_colls_20221213.json")
+  f <- file(collsJsonPath)
   
   colls <- fromJSON(f) %>%
     select("institution", "collection", "lat", "lon", "collection_uuid",
@@ -31,7 +43,7 @@ loadCollData <- function() {
   # Merge recordset counts into the colls dataframe.  This file was created by
   # running queries stored in colls$recordsetQuery for each coll that has them.
   collUuidsToCounts <-
-    read.csv("data/coll_uuid_to_counts_20221213.csv", stringsAsFactors = F)
+    read.csv(collsRsetCountsCsvPath, stringsAsFactors = F)
   
   colls <- merge(
     x = colls,
@@ -79,7 +91,7 @@ fetchMissingCount <- function(rsqString) {
 loadIDigTotals <- function() {
   
   #feed <- getFeedFromUrl("https://ipt.idigbio.org/rss.do")
-  feed <- getFeedFromFile("data/idigbio_ipt_rss_20221213.xml")
+  feed <- getFeedFromFile(idbRssPath)
   length(feed$items)
 }
 
@@ -87,7 +99,7 @@ loadIDigTotals <- function() {
 loadVertNetTotals <- function() {
   
   #feed <- getFeedFromUrl("http://ipt.vertnet.org:8080/ipt/rss.do")
-  feed <- getFeedFromFile("data/vertnet_ipt_rss_20221213.xml")
+  feed <- getFeedFromFile(vertNetRssPath)
   length(feed$items)
 }
 
@@ -102,7 +114,7 @@ loadRecordsets <- function() {
   #   fromJSON("https://search.idigbio.org/v2/search/recordsets?limit=3000",
   #            flatten = T)$items
   
-  rsets <- fromJSON(file("data/idb_api_recordsets_20221213.json"),
+  rsets <- fromJSON(file(idbApiRsetsJsonPath),
                     flatten = T)$items
   
   rsets <- rsets %>%
@@ -124,13 +136,12 @@ loadFreshRecordsets <- function() {
   #   ssl.verifypeer = TRUE
   #   )
   
-  f <- file("data/fresh-recordsets-last-360-days_20221214.csv")
+  f <- file(freshRsetsCsvPath)
   rsets <- read.csv(f, stringsAsFactors = F)
 
-  vertNetUuid <- "e699547d-080e-431a-8d9b-3d56e39808f0"
   rsets <- rsets %>%
     select(name, publisher_uuid, file_link, first_seen, pub_date) %>%
-    filter(!publisher_uuid == vertNetUuid)
+    filter(!publisher_uuid == VertNetUuid)
   
   return(rsets)
 }
@@ -147,7 +158,7 @@ loadPublishers <- function() {
   #   flatten = T)$items
   
   pubs <- fromJSON(
-    file("data/idb_api_publishers_20221213.json"), flatten=T)$items
+    file(idbApiPubsJsonPath), flatten=T)$items
   
   pubs <- pubs %>% select(uuid, data.name, data.rss_url)
   return(pubs)
